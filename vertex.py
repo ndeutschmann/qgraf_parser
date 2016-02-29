@@ -1,6 +1,16 @@
 import re
 import sys
 
+FERMIONS = ["t","b"]
+
+def pparse(p):
+    lp=re.split("[+-]",p)
+    for mom in [x for x in lp if x!='']:
+        p=p.replace(mom,mom+",")
+    lp=p.split(",")
+    return [x for x in lp if x!='']
+           
+
 class Vertex:
     def __init__(self,element):
         try:
@@ -14,17 +24,11 @@ class Vertex:
         except:
             print "Error while defining vertex object"
     def writenextprop(self,file,line=1):
-        if self.types[1]!="t":
+        if self.types[1]! in FERMIONS:
             print "No fermion coming out of this vertex ! Something is wrong."
         else:
             file.write("i_*(")
-            p=self.momenta[0]
-            lp=re.split("[+-]",p)
-            lp[:]=[x for x in lp if x!='']
-            for mom in lp:
-                p=p.replace(mom,mom+",")
-            lp=p.split(",")
-            lp[:]=[x for x in lp if x!='']
+            lp=pparse(self.momenta[0])
             for p in lp:
                 file.write("g_("+str(line)+","+p+")+")
             file.write("mt)*D("+self.momenta[0]+",mt)*d_(col"+self.fields[0]+",col"+str(int(self.fields[0])-1)+")")
