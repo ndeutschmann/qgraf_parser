@@ -6,10 +6,10 @@ import sys
 from vertex import *
 
 
-
 graphs=XML(default_loader("grafs",parse))
 diagrams=graphs.find("diagrams")
 
+fermionvertices = ["tbar,t,H","tbar,t,g", "bbar,b,g"]:
 
 for diagram in diagrams.getchildren():
     number=diagram.find("id").text
@@ -49,72 +49,44 @@ for diagram in diagrams.getchildren():
 
     #Sort vertices between fermionic and nonfermionic and create fermion lines
     for v in vertices:
-        if v.type in ["tbar,t,H","tbar,t,g"]:
-            #print "I found a fermion vertex: "+v.type
-            #print str(v.fields)
+        if v.type in fermionvertices
             if len(fermionlines)==0: #If there are no lines yet, create one
-                fermionlines=[[v]] 
-                #print "Created a fermion line"
+                fermionlines=[line()]
+                fermionlines[0].addv(v)
             else: #If there exist lines
-                sv=set([str(int(v.fields[0])-1),str(int(v.fields[1])+1)]) # Make a set of fermions connected to this vertex (2i is the antifermion connected to fermion 2i-1)
                 found=False
                 matches = []
                 for line in fermionlines: 
-                    for vl in line:
-                        if bool(set(vl.fields)&sv): #If non zero intersection it's our line
-                            found=True
-                            matches.append(line)
-                            break
+                    if v in line:
+                        found=True
+                        matches.append(line)
                 if found:
-                    #print "This matches "+str(len(matches))+"lines"
-                    mergedline = [v]
+                    mergedline=line().addv(v)
                     for line in matches:
-                        #print "one line contains"
-                        #for v in line:
-                            #print str(v.fields)
                         mergedline=mergedline+line
-                        #print "mergedline contains"
-                        #for v in mergedline:
-                            #print str(v.fields)
+                        print len(fermionlines)#FOR TEST
                         fermionlines.remove(line)
+                        print len(fermionlines)#FOR TEST
                     fermionlines.append(mergedline)
                 if not found:
                     #print "This is a new line !"
-                    fermionlines.append([v])
+                    fermionlines.append(line().addv(v))
         else:
             nfvertices.append(v)    
 
     file.write(prefactor)
 
     count=0
-    #print "There are "+str(len(fermionlines))+"lines"
     for line in fermionlines:
-        #print "Line "+str(count)
-        #for v in line:
-            #print str(v.fields)
-        count=count+1
-        nv=len(line)
-        v=line[0]
-        line.remove(v)
-        i=0
-        while(i<nv):
+        for v in line:
             file.write("*")
-            #print "vertext number "+str(v.fields)
             v.output(file,count)
             file.write("*")
             v.writenextprop(file,count)
-            i=i+1          
-            for vv in line:
-                if int(vv.fields[1])+1==int(v.fields[0]):
-                    v=vv
-                    line.remove(vv)
-                    break
-                
+        count=count+1
     for v in nfvertices:
        file.write("*")
        v.output(file)
-
-    
 
     for p in propagators:
 
@@ -126,8 +98,6 @@ for diagram in diagrams.getchildren():
 
 
     file.write(");\n")
-#    file.write("Local A1 = (d_(muext1,muext3) - p2(muext1)*p1(muext3)/(p1.p2))*Diagram;\n")
-    file.write("Local A9 = (d_(muext1,muext3) - 2*p2.q1*q1(muext1)*p1(muext3)/(pt2*p1.p2) - 2*p1.q1*q1(muext3)*p2(muext1)/(pt2*p1.p2) + 2*q1(muext1)*q1(muext3)/pt2 )*Diagram;\n")
     for i in range(1,len(fermionlines)+1):
         file.write("Tracen,"+str(i)+";\n")
     file.write("#call SUn\n")
@@ -140,6 +110,6 @@ for diagram in diagrams.getchildren():
     file.write("id q1.q1=0;\n")
     file.write("id Delta(bext1?,bext3?)=d_(bext1,bext3);\n")
     file.write(".sort\n")
-    file.write("Print A9;\n")
+    file.write("Print ;\n")
     file.write(".end")
 
