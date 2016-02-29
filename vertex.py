@@ -30,49 +30,51 @@ class Vertex:
             file.write("i_*(")
             lp=pparse(self.momenta[0])
             for p in lp:
-                file.write("g_("+str(line)+","+p+")+")
-            file.write("mt)*D("+self.momenta[0]+",mt)*d_(col"+self.fields[0]+",col"+str(int(self.fields[0])-1)+")")
+                file.write("g_({},{})+".format(line,p))
+            file.write("m{})*D({},m{})*d_(col{},col{})".format(self.types[1],self.types[1],self.momenta[0],self.fields[0],int(self.fields[0])-1))
     def contains(self,f):
         f in self.fields
     def output(self,file,line=1):
         if self.type=="tbar,t,g":
-            file.write("i_*g*g_("+str(line)+",mu"+self.fields[2]+")*T(b"+self.fields[2]+",col"+self.fields[0]+",col"+self.fields[1]+")")
+            file.write("i_*g*g_({},mu{})*T(b{},col{},col{})".format(line,self.fields[2],self.fields[2],self.fields[0],self.fields[1]))
         elif self.type=="tbar,t,H":
-            file.write("i_*Y*d_(col"+self.fields[0]+",col"+self.fields[1]+")")
+            file.write("i_*Y*d_(col{},col{})".format(self.fields[0],self.fields[1]))
         elif self.type=="H,H,H":
             file.write("i_*h3")
         elif self.type=="H,H,H,H":
             file.write("i_*h4")
         elif self.type=="g,g,g":
-            file.write("(-g3*f(b"+self.fields[0]+",b"+self.fields[1]+",b"+self.fields[2]+")*(0")
+            file.write("(-g3*f(b{},b{},b{})*(0".format(self.fields[0],self.fields[1],self.fields[2]))
             for i in range(0,3):
                 j=(i+1)%3
                 k=(i+2)%3
                 p1=self.momenta[i]
                 p2=self.momenta[j]
-                lp1=re.split("[+-]",p1) #get a list of all momenta combined in leg i
-                lp2=re.split("[+-]",p2) #get a list of all momenta combined in leg j
-                lp1[:]=[x for x in lp1 if x!='']
-                lp2[:]=[x for x in lp2 if x!='']
+                lp1=pparse(p1)
+                lp2=pparse(p2)
                 #add the index k to each individual momentum and then p-k
                 for mom in lp1:
                     if p1!="0":
-                        p1=p1.replace(mom,mom+"(mu"+self.fields[k]+")")
+                        p1=p1.replace(mom,mom+"(mu{})".format(self.fields[k])
                 for mom in lp2:
                     if p2!="0":
-                        p2=p2.replace(mom,mom+"(mu"+self.fields[k]+")")
-                p="("+p1+"-("+p2+"))"
-                file.write("+d_(mu"+self.fields[i]+",mu"+self.fields[j]+")*"+p)
+                        p2=p2.replace(mom,mom+"(mu{})".format(self.fields[k])
+                p="({}-({}))".format(p1,p2)
+                file.write("+d_(mu{},mu{})*{}").format(self.fields[i],self.fields[j],p)
             file.write("))")
         elif self.type=="g,g,g,g":
-            i=0
-            j=1
-            k=2
-            l=3
+            i=self.fields[0]
+            j=self.fields[1]
+            k=self.fields[2]
+            l=self.fields[3]
             file.write("(-i_)*g^2*(")
-            file.write("f(b"+self.fields[i]+",b"+self.fields[j]+",bdummy)*f(b"+self.fields[k]+",b"+self.fields[l]+",bdummy)*(d_(mu"+self.fields[i]+",mu"+self.fields[k]+")*d_(mu"+self.fields[j]+",mu"+self.fields[l]+")-d_(mu"+self.fields[i]+",mu"+self.fields[l]+")*d_(mu"+self.fields[j]+",mu"+self.fields[k]+"))")
-            file.write("+f(b"+self.fields[i]+",b"+self.fields[k]+",bdummy)*f(b"+self.fields[j]+",b"+self.fields[l]+",bdummy)*(d_(mu"+self.fields[i]+",mu"+self.fields[j]+")*d_(mu"+self.fields[k]+",mu"+self.fields[l]+")-d_(mu"+self.fields[i]+",mu"+self.fields[l]+")*d_(mu"+self.fields[j]+",mu"+self.fields[k]+"))")
-            file.write("+f(b"+self.fields[i]+",b"+self.fields[l]+",bdummy)*f(b"+self.fields[j]+",b"+self.fields[k]+",bdummy)*(d_(mu"+self.fields[i]+",mu"+self.fields[j]+")*d_(mu"+self.fields[k]+",mu"+self.fields[l]+")-d_(mu"+self.fields[i]+",mu"+self.fields[k]+")*d_(mu"+self.fields[j]+",mu"+self.fields[l]+"))")
+
+
+            file.write("f(b{},b{},bdummy)*f(b{},b{},bdummy)*(d_(mu{},mu{})*d_(mu{},mu{})-d_(mu{},mu{})*d_(mu{},mu{}))".format(i,j,k,l,i,k,j,l,i,l,j,k))
+
+            file.write(" +f(b{},b{},bdummy)*f(b{},b{},bdummy)*(d_(mu{},mu{})*d_(mu{},mu{})-d_(mu{},mu{})*d_(mu{},mu{}))".format(i,k,j,l,i,j,k,l,i,l,j,k))
+
+            file.write(" +f(b{},b{},bdummy)*f(b{},b{},bdummy)*(d_(mu{},mu{})*d_(mu{},mu{})-d_(mu{},mu{})*d_(mu{},mu{}))".format(i,l,j,k,i,j,k,l,i,k,j,l))
             file.write(")")
         else:
             print "ERROR: Unknown vertex type"
