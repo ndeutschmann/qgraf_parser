@@ -1,50 +1,72 @@
 import re
-import vertex
+from vertex import *
 
 class Line:
     def __init__(self):
         self.vertices = []
-        self.open = false
+        self.open = False
     def __getitem__(self,index):
         return self.vertices[index]
     def __setitem__(self,index,value):
-        return self.vertices[index]=value
-    def __additem__(self,v):
-        (next,prev)=(string(int(v.fields[1])+1),string(it(v.fields[0])-1))
-        #v.fields[0] is an anti-particle (psibar-psi G). [1] is a particle
-        #propagators are of the form (particle 2i-1,antiparticle 2i) (psi-psibar)
-        #propagator momentum runs from anti-particle to particle
-        #i.e field orderning and numbering in propagators reflects the order of the gamma structure in the expressions !
-        #hence next is the antiparticle connected to the particle in fields[1] and vice versa for prev
-        set i to 0.
-        set found to False
-        for w in self.vertices:
-            if next == w.fields[0]:
-                self.vertices.insert(v,i)
-                set found to True
-                break
-            if prev == w.fields[1]:
-                self.vertices.insert(v,i+1)
-                set found to True
-                break
-            i=i+1
-        if !Found:
+        self.vertices[index]=value
+    def additem(self,v):
+        if re.search('[a-zA-Z]',v.fields[0]):
+            self.vertices.insert(0,v)
+            self.open = True
+        elif re.search('[a-zA-Z]',v.fields[1]):
             self.vertices.append(v)
-        if !self.open:
-            for f in v.fields:
-                if re.search('[a-zA-Z]',f):
-                    self.open=True
+            self.open = True
+        else:
+            (next,prev)=(str(int(v.fields[1])+1),str(int(v.fields[0])-1))
+            i = 0
+            found = False
+            for w in self.vertices:
+                if next == w.fields[0]:
+                    self.vertices.insert(i,v)
+                    found = True
+                    break
+                if prev == w.fields[1]:
+                    self.vertices.insert(i+1,v)
+                    found = True
+                    break
+                i=i+1
+            if not found:
+                self.vertices.append(v)
+
 
     def __iter__(self):
         return iter(self.vertices)
     def __len__(self):
         len(self.vertices)
     def __contains__(self,v):
-        v in self.vertices
+        print ""
+        print "trying to see if"
+        print v.fields
+        print "is connected to"
+        for w in self.vertices:
+            print w.fields
+        contained = False
+        for w in self.vertices:
+            try:
+                if int(v.fields[0])-1 == int(w.fields[1]):
+                    contained = True
+                    break
+            except ValueError:
+                pass
+            try:
+                if int(v.fields[1])+1 == int(w.fields[0]):
+                    contained = True
+                    break
+            except ValueError:
+                pass
+
+        return contained
+
+        #v in self.vertices
     def __add__(self,line2):
         nline = Line()
-        nline.vertices=list(self.vertices)
+        for v in self:
+            nline.additem(v)
         for v in line2:
             nline.additem(v)
-        nline.open = self.open | line2.open
         return nline

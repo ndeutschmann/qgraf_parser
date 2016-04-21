@@ -4,19 +4,21 @@ from xml.etree.ElementInclude import *
 import re
 import sys
 from vertex import *
-
+from line import*
 
 graphs=XML(default_loader("grafs",parse))
 diagrams=graphs.find("diagrams")
 
-fermionvertices = ["tbar,t,H","tbar,t,g", "bbar,b,g"]:
-
+fermionvertices = ["tbar,t,H","tbar,t,g", "bbar,b,g"]
 for diagram in diagrams.getchildren():
     number=diagram.find("id").text
+    print ""
+    print ""
+    print "Starting diagram number "+number
     filename="diagram"+str(number)+".frm"
     file=open(filename,"w+")
     file.write("format mathematica;\n")
-    file.write("CFunction i,g,Y,h3,h4,D,mt,mH,gt,g3,g4;\n")#This could use an automation as well
+    file.write("CFunction i,g,Y,h3,h4,mt,s,mH,mb,gt,g3,g4,Denom;\n")#This could use an automation as well
     file.write("Tensor Tr(cyclic),T,Tp,f(antisymmetric),ff(rcyclic),Delta(symmetric);\n")
     file.write("Function TM,TT;\n")
     file.write("Symbols a,nf,NF,NA,cF,cA,[cF-cA/6],pt2,Dim;\n")
@@ -30,7 +32,7 @@ for diagram in diagrams.getchildren():
     file.write("Dimension NF;\n")
     file.write("Off statistics;\n")
 
-    file.write("Local Diagram = 1/NA*Delta(bext1,bext3)*(")    
+    file.write("Local Diagram = d_(colext2,colext4)*(")    
     file.write("\n")
     NOvertices=diagram.find("vertices").getchildren()
     propagators=diagram.find("propagators").getchildren()
@@ -49,10 +51,10 @@ for diagram in diagrams.getchildren():
 
     #Sort vertices between fermionic and nonfermionic and create fermion lines
     for v in vertices:
-        if v.type in fermionvertices
+        if v.type in fermionvertices:
             if len(fermionlines)==0: #If there are no lines yet, create one
-                fermionlines=[line()]
-                fermionlines[0].addv(v)
+                fermionlines=[Line()]
+                fermionlines[0].additem(v)
             else: #If there exist lines
                 found=False
                 matches = []
@@ -61,23 +63,32 @@ for diagram in diagrams.getchildren():
                         found=True
                         matches.append(line)
                 if found:
-                    mergedline=line().addv(v)
+                    mergedline=Line()
+                    mergedline.additem(v)
                     for line in matches:
                         mergedline=mergedline+line
-                        print len(fermionlines)#FOR TEST
+                        print "BEFORE REMOVAL "+str(len(fermionlines))#FOR TEST
                         fermionlines.remove(line)
-                        print len(fermionlines)#FOR TEST
+                        print "AFTER REMOVAL "+str(len(fermionlines))#FOR TEST
                     fermionlines.append(mergedline)
                 if not found:
-                    #print "This is a new line !"
-                    fermionlines.append(line().addv(v))
+                    nl = Line()
+                    nl.additem(v)
+                    fermionlines.append(nl)
         else:
             nfvertices.append(v)    
 
     file.write(prefactor)
 
     count=0
+
     for line in fermionlines:
+        print "Is the line open ? "+str(line.open)
+        if line.open:
+            print "opening the line"
+            line[0].openline(file,count)
+        else:
+            print "not doing anything: the line is not open"
         for v in line:
             file.write("*")
             v.output(file,count)
@@ -89,26 +100,21 @@ for diagram in diagrams.getchildren():
        v.output(file)
 
     for p in propagators:
-
         if p.find("field").text=="g":
             i=2*int(p.find("id").text)
-            file.write("*(-i_)*D("+p.find("momentum").text+",0)*d_(mu"+str(i)+",mu"+str(i-1)+")*d_(b"+str(i)+",b"+str(i-1)+")")
+            file.write("*(-i_)*Denom({},0)*d_(mu{},mu{})*d_(b{},b{})".format(p.find("momentum").text,str(i),str(i-1),str(i),str(i-1)))
         elif p.find("field").text=="H":
-            file.write("*i_*D("+p.find("momentum").text+",mH)")
+            file.write("*i_*Denom({},mH)".format(p.find("momentum").text))
 
 
     file.write(");\n")
-    for i in range(1,len(fermionlines)+1):
+    for i in range(0,len(fermionlines)):
         file.write("Tracen,"+str(i)+";\n")
     file.write("#call SUn\n")
     file.write("id a=1/2;\n")
-    file.write("id pt2 = 2*(p1.q1)*(p2.q1)/(p1.p2);\n")
-    file.write("id pt2^-1 = (p1.p2)/(2*(p1.q1)*(p2.q1));\n")
-    file.write("id mH=0;\n")
-    file.write("id p1.p1=0;\n")
-    file.write("id p2.p2=0;\n")
-    file.write("id q1.q1=0;\n")
-    file.write("id Delta(bext1?,bext3?)=d_(bext1,bext3);\n")
+    file.write("id p1.p1=s;\n")
+    file.write("id q1.q1=mb^2;\n")
+    file.write("id q2.q2=mb^2;\n")
     file.write(".sort\n")
     file.write("Print ;\n")
     file.write(".end")
