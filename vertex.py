@@ -91,7 +91,7 @@ class Vertex:
             file.write("Ctg*g*f(b{},b{},bdummy)*T(bdummy,col{},col{})*(g_({},mu{})*g_({},mu{})-g_({},mu{})*g_({},mu{}))".format(self.fields[2],self.fields[3],self.fields[0],self.fields[1],line,self.fields[3],line,self.fields[2],line,self.fields[2],line,self.fields[3]))
         ######QCD######
         elif self.type=="tbar,t,H":
-            file.write("i_*Y*d_(col{},col{})".format(self.fields[0],self.fields[1]))
+            file.write("(-i_)*Y*d_(col{},col{})".format(self.fields[0],self.fields[1]))
         ######QCD######
         elif self.type=="H,H,H":
             file.write("i_*h3")
