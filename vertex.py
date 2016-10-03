@@ -110,7 +110,7 @@ class Vertex:
                     if p2!="0":
                         p2mu=p2.replace(mom,mom+"(mu{})".format(self.fields[0]))
 
-            file.write("-4*i_*Cgf*v*d_(b{},b{})*(p1.p2*d_(mu{},mu{})-{}*{})".format(self.fields[0],self.fields[1],self.fields[0],self.fields[1],p1nu,p2mu))
+            file.write("(-4)*i_*Cgf*v*d_(b{},b{})*(p1.p2*d_(mu{},mu{})-{}*{})".format(self.fields[0],self.fields[1],self.fields[0],self.fields[1],p1nu,p2mu))
         ######QCD######
         elif self.type=="H,H,H,H":
             file.write("i_*h4")
