@@ -96,6 +96,22 @@ class Vertex:
         elif self.type=="H,H,H":
             file.write("i_*h3")
         ######QCD######
+        ## AIDE MEMOIRE (p1.p2*d_(muext1,muext3)-p1(muext3)*p2(muext1))*d_(bext1,bext3)
+        elif self.type=="g,g,H":
+
+            p1 = self.momenta[0]
+            p2 = self.momenta[1]
+            lp1=pparse(p1)
+            lp2=pparse(p2)
+            for mom in lp1:
+                if p1!="0":
+                    p1nu=p1.replace(mom,mom+"(mu{})".format(self.fields[1]))
+                for mom in lp2:
+                    if p2!="0":
+                        p2mu=p2.replace(mom,mom+"(mu{})".format(self.fields[0]))
+
+            file.write("-4*i_*Cgf*v*d_(b{},b{})*(p1.p2*d_(mu{},mu{})-{}*{})".format(self.fields[0],self.fields[1],self.fields[0],self.fields[1],p1nu,p2mu))
+        ######QCD######
         elif self.type=="H,H,H,H":
             file.write("i_*h4")
         ######QCD######

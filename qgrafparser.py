@@ -18,7 +18,7 @@ for diagram in diagrams.getchildren():
     filename="diagram"+str(number)+".frm"
     file=open(filename,"w+")
     file.write("format mathematica;\n")
-    file.write("CFunction i,g,Y,h3,h4,v,Ctg,mt,s,mH,Denom;\n")#This could use an automation as well
+    file.write("CFunction i,g,Y,h3,h4,v,Ctg,Cgf,mt,s,mH,Denom;\n")#This could use an automation as well
     file.write("Tensor Tr(cyclic),T,Tp,f(antisymmetric),ff(rcyclic),Delta(symmetric);\n")
     file.write("Function TM,TT;\n")
     file.write("Symbols a,nf,NF,NA,cF,cA,[cF-cA/6],Dim;\n")
