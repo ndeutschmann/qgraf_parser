@@ -59,6 +59,7 @@ class Vertex:
             file.write("i_*g*g_({},mu{})*T(b{},col{},col{})".format(line,self.fields[2],self.fields[2],self.fields[0],self.fields[1]))
             ######EFT: Chromomagnetic operator######
             # WATCH OUT: The momentum in QGRAF is OUTGOING
+            ####ERROR HERE NEEDS CHANGING
             #Build gamma^mu p3_mu
             lp3=pparse(self.momenta[2])
             p3dash = "(";
@@ -118,8 +119,8 @@ class Vertex:
             file.write("i_*h4")
         ######QCD######
         elif self.type=="g,g,g":
-            # WATCH OUT: The momentum in QGRAF is OUTGOING
-            file.write("(-g*f(b{},b{},b{})*(0".format(self.fields[0],self.fields[1],self.fields[2]))
+                # The momentum in QGRAF is ingoing
+            file.write("(g*f(b{},b{},b{})*(0".format(self.fields[0],self.fields[1],self.fields[2]))
             for i in range(0,3):
                 j=(i+1)%3
                 k=(i+2)%3
