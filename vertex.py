@@ -69,7 +69,7 @@ class Vertex:
             for p in lp3:
                 p3dash+="+g_({},{})".format(line,p)
             p3dash+=")"
-            file.write("+(i_)*Ctg*v*({}*g_({},mu{})-g_({},mu{})*{})*T(b{},col{},col{})".format(,p3dash,line,self.fields[2],line,self.fields[2],p3dash,self.fields[2],self.fields[0],self.fields[1]))
+            file.write("+(i_)*Ctg*v*({}*g_({},mu{})-g_({},mu{})*{})*T(b{},col{},col{})".format(p3dash,line,self.fields[2],line,self.fields[2],p3dash,self.fields[2],self.fields[0],self.fields[1]))
             ######SUM OF TWO TERMS######
             file.write(")")
 
