@@ -4,3 +4,6 @@ LO
 tests
 grafs
 *.frm
+qgraf-py3-venv/
+.idea/
+
