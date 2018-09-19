@@ -1,10 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 from xml.etree.ElementTree import *
 from xml.etree.ElementInclude import *
-import re
-import sys
-from vertex import *
-from line import*
+from qgraf_parser.line import*
 
 graphs=XML(default_loader("grafs",parse))
 diagrams=graphs.find("diagrams")

@@ -1,4 +1,4 @@
-from models.common_tools.abstract_objects import Parameter,ParameterDict,zero
+from qgraf_parser.models.common_tools.abstract_objects import Parameter,ParameterDict,zero
 
 g = Parameter('g', name='gs', info='strong coupling constant')
 I = Parameter('i_', name='I', info='unit imaginary number')

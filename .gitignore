@@ -6,4 +6,5 @@ grafs
 *.frm
 qgraf-py3-venv/
 .idea/
-
+*.ipynb
+.ipynb_checkpoints/
