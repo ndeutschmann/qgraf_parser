@@ -60,6 +60,6 @@ def attach_indices(tensors,*indices):
         tensor_list = pparse(tensors)
         indices_between_parentheses = "({})".format(",".join(indices))
         for t in tensor_list:
-            return tensors.replace(t, t + "(%s)"%)
+            return tensors.replace(t, t + indices_between_parentheses)
     else:
         return tensors
