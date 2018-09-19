@@ -1,3 +1,59 @@
+class AbstractObjectDict(object):
+    """Dictionnary-like class with iteration over values
+
+    This is a meta class which fails upon instantiation. Daughter classes should specify the class attribute _type as a class objet for the thing to be contained in a <type>Dict. It is necessary that the type in question have an attribute "name".
+
+    New item should be added using the method append which creates a key using the item's name attribute.
+    This class can be iterated over and the iteration returns the *values* in the dictionary, *not the keys*.
+
+    Methods
+    -------
+    append(obj)
+
+    Attributes
+    ----------
+    internal_dict: dict
+        the dictionary in which data is stored
+    _type: type
+        the type of the objects contained here
+    """
+
+    _type = None
+
+    def append(self,obj):
+        if not isinstance(obj, self._type):
+            raise TypeError("All elements in a " + str(type(self)) + " need to be of type " + _type)
+        if obj.name in self.internal_dict:
+            raise KeyError("This object name exists already!")
+        self.internal_dict[obj.name]=obj
+
+    def __init__(self,list_of_objects):
+        if self._type = None
+            raise NotImplementedError("Use a specific daughter class of AbstractObjectDictionnary")
+
+
+        self.internal_dict={}
+
+        for obj in list_of_objects:
+            self.append(obj)
+
+    def __getitem__(self, item):
+        return self.internal_dict[item]
+
+    def __iter__(self):
+        self._iterator = iter(self.internal_dict)
+        return self
+    def __next__(self):
+        key = next(self._iterator)
+        return self[key]
+    def __repr__(self):
+        return str(list(self.internal_dict.keys()))
+
+
+
+
+
+
 class Parameter(str):
     """ Abstract representation of a parameter.
 
@@ -51,57 +107,11 @@ class Parameter(str):
 
 
 
-class ParameterList(list):
+class ParameterDict(AbstractObjectDict):
     """
-    Container for couplings.
-    For now just checks that all entries are Parameters
-
-    TODO describe checks
-    TODO describe __getattr__
+    Container for Parameters. Inherits from AbstractObjectDict
     """
-    def __new__(cls, *args, **kwargs):
-        """
-
-        Parameters
-        ----------
-        args :
-        kwargs :
-
-        Returns
-        -------
-
-        """
-        new_parameter_list = list.__new__(cls,*args, **kwargs)
-        for param in new_parameter_list:
-            try:
-                assert isinstance(param,Parameter)
-            except AssertionError:
-                raise AssertionError("Cannot create a ParameterList: all entries should be of Parameter type")
-        # Check that there are no name duplicates
-        try:
-            assert len(new_parameter_list) == len(set([param.name for param in new_parameter_list]))
-        except AssertionError:
-            raise AssertionError("Cannot create a ParameterList: there are two entries with the same name attribute")
-        return new_parameter_list
-    def append(self, param):
-        try:
-            assert isinstance(param,Parameter)
-        except AssertionError:
-            raise AssertionError("Cannot append to this ParameterList: all entries should be of Parameter type")
-        # Check that we're not adding a parameter with an existing name
-        try:
-            assert param.name not in [p.name for p in self]
-        except AssertionError:
-            raise AssertionError("Cannot append Parameter to this ParameterList: this name already exists")
-        super().append(param)
-    def __getattr__(self, item):
-        """
-        Use parameter names as attributes
-        """
-        for param in self:
-            if item == param.name:
-                return param
-            raise AttributeError("No parameter with name % found"%item)
+    _type = Parameter
 
 
 class Particle:
@@ -141,46 +151,11 @@ class Particle:
 
 
 
-class ParticleList(list):
+class ParticleDict(list):
     """
-    Container for couplings.
-    For now just checks that all entries are Particles
-    TODO BAD implement a mother class for mixed list-dict behavior
-    TODO describe checks
-    TODO describe __getattr__
+    Container for Particles. Inherits from AbstractObjectDict
     """
-    def __new__(cls, *args, **kwargs):
-        new_particle_list = list.__new__(cls,*args, **kwargs)
-        for part in new_particle_list:
-            try:
-                assert isinstance(part,Particle)
-            except AssertionError:
-                raise AssertionError("Cannot create a ParticleList: all entries should be of Particle type")
-        # Check that there are no name duplicates
-        try:
-            assert len(new_particle_list) == len(set([part.name for part in new_particle_list]))
-        except AssertionError:
-            raise AssertionError("Cannot create a ParticleList: there are two entries with the same name attribute")
-        return new_particle_list
-    def append(self, part):
-        try:
-            assert isinstance(part,Particle)
-        except AssertionError:
-            raise AssertionError("Cannot append to this ParticleList: all entries should be of Particle type")
-        # Check that we're not adding a particle with an existing name
-        try:
-            assert part.name not in [p.name for p in self]
-        except AssertionError:
-            raise AssertionError("Cannot append Particle to this ParticleList: this name already exists")
-        super().append(part)
-    def __getattr__(self, item):
-        """
-        Use particle names as attributes
-        """
-        for part in self:
-            if item == part.name:
-                return part
-            raise AttributeError("No particle with name % found"%item)
+    _type = Particle
 
 
 
