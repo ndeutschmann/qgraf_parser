@@ -1,3 +1,5 @@
+from itertools import permutations
+
 class AbstractObjectDict(object):
     """Dictionnary-like class with iteration over values
 
@@ -28,18 +30,13 @@ class AbstractObjectDict(object):
         self.internal_dict[obj.name]=obj
 
     def __init__(self,list_of_objects):
-        if self._type = None
+        if self._type is None:
             raise NotImplementedError("Use a specific daughter class of AbstractObjectDictionnary")
-
-
         self.internal_dict={}
-
         for obj in list_of_objects:
             self.append(obj)
-
     def __getitem__(self, item):
         return self.internal_dict[item]
-
     def __iter__(self):
         self._iterator = iter(self.internal_dict)
         return self
@@ -151,11 +148,63 @@ class Particle:
 
 
 
-class ParticleDict(list):
+class ParticleDict(AbstractObjectDict):
     """
     Container for Particles. Inherits from AbstractObjectDict
     """
     _type = Particle
+
+
+class Interaction(object):
+    """Abstract representation of an interaction vertex
+    TODO add more structure based on the new qgraf vertex object
+    """
+    def __init__(self,particles,feynman_rule):
+        self.particles = ParticleDict(particles)
+        self.feynman_rule = feynman_rule
+        self.name = ",".join([particle.name for particle in particles])
+    def __call__(self,vertex):
+        return self.feynman_rule(vertex)
+
+class InteractionDict(AbstractObjectDict):
+    """Container for Interactions. Inherits from AbstractObjectDict
+    An interactionDict is callable using a Vertex object which searches and calls the correct interaction.
+    """
+    _type = Interaction
+    def __getitem__(self, item):
+        """Get the content of the dictionary. Two ways of doing so: either with the name of the interaction or with a list of particle names. Due to how interaction names are generated, in this second case, all possible names can be obtained by looping over orderings of the particle names and joining them with commas.
+
+        Parameters
+        ----------
+        item : str or list of str
+            interaction name or list of particle names
+
+        Returns
+        -------
+        self[item] : Interaction
+        """
+        if isinstance(item,str):
+            return self.internal_dict[item]
+        else:
+            assert isinstance(item,list)
+            orderings = list(permutations(item))
+            for ordering in orderings:
+                if sum(ordering) in self.internal_dict:
+                    break
+            return self.internal_dict[sum(ordering)]
+    def __call__(self,vertex):
+        """Use the vertex.types list of particle names as a key in the dictionary and call the corresponding interaction, i.e. Interaction.feynman_rule
+
+        Parameters
+        ----------
+        vertex : vertex.Vertex
+            a Vertex object defined in qgraf_parser
+
+        Returns
+        -------
+        str
+        """
+        return self[vertex.types](vertex)
 
 
 
