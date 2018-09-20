@@ -160,10 +160,27 @@ class Interaction(object):
     TODO add more structure based on the new qgraf vertex object
     """
     def __init__(self,particles,feynman_rule):
+        """Creator for the Interaction class
+
+        Parameters
+        ----------
+        particles : list of Particle
+        feynman_rule : function
+        """
         self.particles = ParticleDict(particles)
         self.feynman_rule = feynman_rule
         self.name = ",".join([particle.name for particle in particles])
     def __call__(self,vertex):
+        """Create a string corresponding to the feynman rule for the qgraf_parser Vertex vertex
+
+        Parameters
+        ----------
+        vertex : qgraf_parser.vertex.Vertex
+
+        Returns
+        -------
+        str
+        """
         return self.feynman_rule(vertex)
 
 class InteractionDict(AbstractObjectDict):

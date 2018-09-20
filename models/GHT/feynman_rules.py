@@ -1,7 +1,7 @@
 #TODO use parameters instead of string litterals!
 #TODO use the info on the particle ids based
 """Implementation of the vertices of the GHT model"""
-from qgraf_parser.models.common_tools.algebra_tools import *
+from ..common_tools.algebra_tools import *
 
 def txtg(vertex):
     prefactor = "i_*g"
