@@ -8,9 +8,13 @@ class AbstractObjectDict(object):
     New item should be added using the method append which creates a key using the item's name attribute.
     This class can be iterated over and the iteration returns the *values* in the dictionary, *not the keys*.
 
+    One can relabel added items using self.relabel(old_key,new_key)
+
     Methods
     -------
     append(obj)
+    relabel(old_key,new_key)
+    keys
 
     Attributes
     ----------
@@ -35,6 +39,16 @@ class AbstractObjectDict(object):
         self.internal_dict={}
         for obj in list_of_objects:
             self.append(obj)
+
+    def relabel(self,old_key,new_key):
+        """Relabel a key of the dictionary"""
+        self.internal_dict[new_key] = self.internal_dict[old_key]
+        del self.internal_dict[old_key]
+
+    def keys(self):
+        """Access the keys of the internal dictionary"""
+        return self.internal_dict.keys()
+
     def __getitem__(self, item):
         return self.internal_dict[item]
     def __iter__(self):
