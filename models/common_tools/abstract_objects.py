@@ -184,22 +184,33 @@ class Interaction(object):
         self.particles = ParticleDict(particles)
         self.feynman_rule = feynman_rule
         self.name = ",".join([particle.name for particle in particles])
-    def __call__(self,vertex):
+    def generate_feynman_rule(self,fields,*,line=None):
         """Create a string corresponding to the feynman rule for the qgraf_parser Vertex vertex
 
         Parameters
         ----------
-        vertex : qgraf_parser.vertex.Vertex
+        fields: list of qgraf_parser.diagram_elements.Diagram_Field
+            list of fields
+        line: str,optional
+            the fermion line
 
         Returns
         -------
         str
+            the expression of the feynman rule for this interaction with a specific choice of fields.
         """
-        return self.feynman_rule(vertex)
+        # Generate a dictionary field_name : [list of matching ids]
+        field_index_mapper = {}
+        for field in fields:
+            if field.name in field_index_mapper:
+                field_index_mapper[field.name].append(field.id)
+            else:
+                field_index_mapper[field.name]=[field.id]
+
+        return self.feynman_rule(field_index_mapper,line=line)
 
 class InteractionDict(AbstractObjectDict):
     """Container for Interactions. Inherits from AbstractObjectDict
-    An interactionDict is callable using a Vertex object which searches and calls the correct interaction.
     """
     _type = Interaction
     def __getitem__(self, item):
@@ -223,19 +234,6 @@ class InteractionDict(AbstractObjectDict):
                 if sum(ordering) in self.internal_dict:
                     break
             return self.internal_dict[sum(ordering)]
-    def __call__(self,vertex):
-        """Use the vertex.types list of particle names as a key in the dictionary and call the corresponding interaction, i.e. Interaction.feynman_rule
-
-        Parameters
-        ----------
-        vertex : vertex.Vertex
-            a Vertex object defined in qgraf_parser
-
-        Returns
-        -------
-        str
-        """
-        return self[vertex.types](vertex)
 
 
 
