@@ -31,7 +31,7 @@ def minus(x):
     :param x: a string
     :return: -(x)
     """
-    return "-"+parwrap(x)
+    return "-".join(parwrap(x))
 
 def pparse(p):
     """Parse a momenta expressed as a sum of +/- individual momenta into each component, keeping the sign.

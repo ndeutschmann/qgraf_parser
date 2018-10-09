@@ -30,7 +30,7 @@ class AbstractObjectDict(object):
         if not isinstance(obj, self._type):
             raise TypeError("All elements in a " + str(type(self)) + " need to be of type " + _type)
         if obj.name in self.internal_dict:
-            raise KeyError("This object name exists already!")
+            raise KeyError("This object name exists already in the dictionnary {}: {}".format(str(self),obj.name))
         self.internal_dict[obj.name]=obj
 
     def __init__(self,list_of_objects):
@@ -58,6 +58,8 @@ class AbstractObjectDict(object):
         key = next(self._iterator)
         return self[key]
     def __repr__(self):
+        return repr(list(self.internal_dict.keys()))
+    def __str__(self):
         return str(list(self.internal_dict.keys()))
 
 
@@ -159,7 +161,8 @@ class Particle:
 
         for key in kwargs:
             self.__setattr__(key,kwargs[key])
-
+    def __str__(self):
+        print("Particle: {p.name}".format(p=self))
 
 
 class ParticleDict(AbstractObjectDict):
@@ -181,7 +184,7 @@ class Interaction(object):
         particles : list of Particle
         feynman_rule : function
         """
-        self.particles = ParticleDict(particles)
+        self.particles = particles
         self.feynman_rule = feynman_rule
         self.name = ",".join([particle.name for particle in particles])
     def generate_feynman_rule(self,fields,*,line=None):
@@ -231,9 +234,9 @@ class InteractionDict(AbstractObjectDict):
             assert isinstance(item,list)
             orderings = list(permutations(item))
             for ordering in orderings:
-                if sum(ordering) in self.internal_dict:
+                if ",".join(ordering) in self.internal_dict:
                     break
-            return self.internal_dict[sum(ordering)]
+            return self.internal_dict[",".join(ordering)]
 
 
 

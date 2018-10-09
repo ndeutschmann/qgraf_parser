@@ -4,7 +4,7 @@ from .parameters import parameters as p
 # Particle definitions
 H    = Particle("H",mass=p["mh"],spin=0)
 t    = Particle("t",mass=p["mt"],spin=2)
-tbar = Particle("t",mass=p["mt"],spin=2)
+tbar = Particle("tbar",mass=p["mt"],spin=2)
 g    = Particle("g",mass=p["zero"],spin=3)
 
 # Bundle it all up
