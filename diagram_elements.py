@@ -19,8 +19,18 @@ class Diagram_Field(object):
             self.id = "ext"+self.id
         self.particle = model.particles[name]
 
+    def nice_string(self):
+        """Generate a long string for a field object"""
+        field_string = "Diagram field for particle type {p.name} with ID {p.id}".format(p=self)
+        return field_string
+    def short_string(self):
+        """Generate a compact notation for a field object"""
+        field_string = "{p.name}({p.id})".format(p=self)
+        return field_string
     def __str__(self):
-        return self.id
+        return self.nice_string()
+    def __repr__(self):
+        return self.short_string()
 
 class Diagram_Vertex(object):
     """Specific vertex in a Feynman diagram
@@ -34,7 +44,7 @@ class Diagram_Vertex(object):
 
     @staticmethod
     def parse_xml_vertex_node(vertex_node):
-        """ Load the relevant data of a XML vertex node
+        """ Load the relevant data of a XML vertex node. This method is accessible through the class attribute `parsers` by calling cls.parsers['XML']
 
         Parameters
         ----------
@@ -46,21 +56,21 @@ class Diagram_Vertex(object):
             triplets of (particle_type,field_id,momentum)
         """
         try:
-            momenta = element.find("momenta").text.split(",")
-            types=element.find("type").text.split(",")
-            fields=element.find("fields").text.split(",")
+            momenta = vertex_node.find("momenta").text.split(",")
+            types=vertex_node.find("type").text.split(",")
+            fields=vertex_node.find("fields").text.split(",")
         except AttributeError as error:
-            logging.error("Error while parsing a XML vertex")
-            logging.error(error)
+            #TODO USE LOGGER
             raise
         try:
             assert len(momenta) == len(fields) and len(momenta) = len(types)
         except AssertionError as error:
-            logging.error("Something went wrong when parsing a vertex: not the same number for each attribute list")
-            logging.error(error)
+            #TODO USE LOGGER
             raise
         return zip(types,fields,momenta)
 
+    # The class attribute `parsers` is a dictionnary of methods that can cast an object created by reading a file input
+    # describing a vertex and outputs a list of triplets [type,field_id,momentum]
     parsers = {"XML": parse_xml_vertex_node}
 
     def __init__(self,vertex_node,model,mode="XML"):

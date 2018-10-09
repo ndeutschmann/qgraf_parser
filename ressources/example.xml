@@ -1,0 +1,231 @@
+<qgraf>
+<version>qgraf-3.1.4</version>
+<input> output = 'grafs' ;style = 'xmldraw.sty' ;model = 'chromomag' ;in = g ;out = g;loops = 1 ;loop_momentum = k ;options = onshell;true = iprop[H,0,0];</input>
+<diagrams>
+ 
+<diagram>
+
+ <id>1</id>
+ <defdata>
+  <incoming>
+  1
+  </incoming>
+  <outgoing>
+  1
+  </outgoing>
+ </defdata>
+ <signsym>-1</signsym>
+
+ <legs>
+  <leg>
+   <field>g</field>
+   <momentum>p1</momentum>
+   <status>in</status>
+   <id>-1</id>
+  </leg>
+  <leg>
+   <field>g</field>
+   <momentum>q1</momentum>
+   <status>out</status>
+   <id>-2</id>
+  </leg>
+ </legs>
+
+ <propagators>
+  <propagator>
+   <mass>mt</mass>
+   <momentum>k1</momentum>
+   <field>t</field>
+   <id>1</id>
+   <from>1</from>
+   <to>1</to>
+  </propagator>
+ </propagators>
+
+ <vertices>
+  <vertex>
+   <id>1</id>
+   <type>tbar,t,g,g</type>
+   <fields>2,1,-1,-2</fields>
+   <momenta>-k1,k1,p1,-q1</momenta>
+  </vertex>
+ </vertices>
+</diagram>
+ 
+<diagram>
+
+ <id>2</id>
+ <defdata>
+  <incoming>
+  1
+  </incoming>
+  <outgoing>
+  1
+  </outgoing>
+ </defdata>
+ <signsym>+1/2</signsym>
+
+ <legs>
+  <leg>
+   <field>g</field>
+   <momentum>p1</momentum>
+   <status>in</status>
+   <id>-1</id>
+  </leg>
+  <leg>
+   <field>g</field>
+   <momentum>q1</momentum>
+   <status>out</status>
+   <id>-2</id>
+  </leg>
+ </legs>
+
+ <propagators>
+  <propagator>
+   <mass>mg</mass>
+   <momentum>k1</momentum>
+   <field>g</field>
+   <id>1</id>
+   <from>1</from>
+   <to>1</to>
+  </propagator>
+ </propagators>
+
+ <vertices>
+  <vertex>
+   <id>1</id>
+   <type>g,g,g,g</type>
+   <fields>-1,-2,1,2</fields>
+   <momenta>p1,-q1,k1,-k1</momenta>
+  </vertex>
+ </vertices>
+</diagram>
+ 
+<diagram>
+
+ <id>3</id>
+ <defdata>
+  <incoming>
+  1
+  </incoming>
+  <outgoing>
+  1
+  </outgoing>
+ </defdata>
+ <signsym>-1</signsym>
+
+ <legs>
+  <leg>
+   <field>g</field>
+   <momentum>p1</momentum>
+   <status>in</status>
+   <id>-1</id>
+  </leg>
+  <leg>
+   <field>g</field>
+   <momentum>q1</momentum>
+   <status>out</status>
+   <id>-2</id>
+  </leg>
+ </legs>
+
+ <propagators>
+  <propagator>
+   <mass>mt</mass>
+   <momentum>k1-p1</momentum>
+   <field>t</field>
+   <id>1</id>
+   <from>2</from>
+   <to>1</to>
+  </propagator>
+  <propagator>
+   <mass>mt</mass>
+   <momentum>k1</momentum>
+   <field>t</field>
+   <id>2</id>
+   <from>1</from>
+   <to>2</to>
+  </propagator>
+ </propagators>
+
+ <vertices>
+  <vertex>
+   <id>1</id>
+   <type>tbar,t,g</type>
+   <fields>4,1,-1</fields>
+   <momenta>-k1,k1-p1,p1</momenta>
+  </vertex>
+  <vertex>
+   <id>2</id>
+   <type>tbar,t,g</type>
+   <fields>2,3,-2</fields>
+   <momenta>-k1+p1,k1,-q1</momenta>
+  </vertex>
+ </vertices>
+</diagram>
+ 
+<diagram>
+
+ <id>4</id>
+ <defdata>
+  <incoming>
+  1
+  </incoming>
+  <outgoing>
+  1
+  </outgoing>
+ </defdata>
+ <signsym>+1/2</signsym>
+
+ <legs>
+  <leg>
+   <field>g</field>
+   <momentum>p1</momentum>
+   <status>in</status>
+   <id>-1</id>
+  </leg>
+  <leg>
+   <field>g</field>
+   <momentum>q1</momentum>
+   <status>out</status>
+   <id>-2</id>
+  </leg>
+ </legs>
+
+ <propagators>
+  <propagator>
+   <mass>mg</mass>
+   <momentum>k1-p1</momentum>
+   <field>g</field>
+   <id>1</id>
+   <from>2</from>
+   <to>1</to>
+  </propagator>
+  <propagator>
+   <mass>mg</mass>
+   <momentum>-k1</momentum>
+   <field>g</field>
+   <id>2</id>
+   <from>2</from>
+   <to>1</to>
+  </propagator>
+ </propagators>
+
+ <vertices>
+  <vertex>
+   <id>1</id>
+   <type>g,g,g</type>
+   <fields>-1,1,3</fields>
+   <momenta>p1,k1-p1,-k1</momenta>
+  </vertex>
+  <vertex>
+   <id>2</id>
+   <type>g,g,g</type>
+   <fields>-2,2,4</fields>
+   <momenta>-q1,-k1+p1,k1</momenta>
+  </vertex>
+ </vertices>
+</diagram>
+</diagrams>
+</qgraf>
+
