@@ -53,6 +53,10 @@ def init_logger(name, *,stderr_output=False,stderr_level=logging.ERROR,stdout_ou
     -------
     logging.Logger
         A logger setup according to specifications
+
+    Notes
+    -----
+    TODO: use a config file instead
     """
     logger = logging.getLogger(name)
 
@@ -64,7 +68,7 @@ def init_logger(name, *,stderr_output=False,stderr_level=logging.ERROR,stdout_ou
         stderr_handler = logging.StreamHandler()
         stderr_handler.setLevel(stderr_level)
         stderr_handler.setFormatter(my_formatter)
-        logger.addHandler(my_screen_handler)
+        logger.addHandler(stderr_handler)
 
     # stderr output handler
     if stdout_output:
@@ -76,7 +80,7 @@ def init_logger(name, *,stderr_output=False,stderr_level=logging.ERROR,stdout_ou
             stdout_handler.setLevel(stdout_min_level)
             stdout_handler.addFilter(LevelFilter(stdout_min_level,stdout_max_level))
             stdout_handler.setFormatter(my_formatter)
-            logger.addHandler(my_screen_handler)
+            logger.addHandler(stdout_handler)
 
     # File output handler
     if logfile_path is None:

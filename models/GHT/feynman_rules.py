@@ -2,10 +2,16 @@
 #TODO use the info on the particle ids based
 """Implementation of the vertices of the GHT model"""
 from ..common_tools.algebra_tools import *
+import logging
+logger = logging.getLogger(__name__)
 
 def txtg(field_index_mapper,*,line=None):
-    if line is None:
-        raise ValueError("Line unspecified in txtg vertex")
+    try:
+        assert line is not None
+    except AssertionError:
+        message = "Line unspecified in txtg vertex"
+        logger.error(message)
+        raise ValueError(message)
     g = field_index_mapper['g'][0]
     tx =field_index_mapper['tbar'][0]
     t = field_index_mapper['t'][0]

@@ -1,21 +1,22 @@
 import logging
-from copy import deepcopy
 
-class Diagram_Field(object):
+logger=logging.getLogger(__name__)
+
+class DiagramField(object):
     """Specific field insertion in a Feynman diagram"""
-    def __init__(self,name,field_ID,momentum,model):
-        """Constructor for a Diagram_Field object.
+    def __init__(self, name, field_id, momentum, model):
+        """Constructor for a DiagramField object.
 
         Parameters
         ----------
         name : str
-        field_ID : int
+        field_id : int
         model : module
         """
         self.name = name
-        self.id = str(abs(field_ID))
+        self.id = str(abs(field_id))
         self.momentum = momentum
-        if field_ID<0:
+        if field_id<0:
             self.id = "ext"+self.id
         self.particle = model.particles[name]
 
@@ -32,9 +33,9 @@ class Diagram_Field(object):
     def __repr__(self):
         return self.short_string()
 
-class Diagram_Vertex(object):
+class DiagramVertex(object):
     """Specific vertex in a Feynman diagram
-
+    TODO
     Attributes
     ----------
 
@@ -60,12 +61,18 @@ class Diagram_Vertex(object):
             types=vertex_node.find("type").text.split(",")
             fields=vertex_node.find("fields").text.split(",")
         except AttributeError as error:
-            #TODO USE LOGGER
+            logger.error("While using the XML vertex node parser:")
+            logger.error("could not find the relevant vertex information in node:")
+            logger.error(vertex_node)
+            logger.error(error)
             raise
         try:
-            assert len(momenta) == len(fields) and len(momenta) = len(types)
+            assert len(momenta) == len(fields) and len(momenta) == len(types)
         except AssertionError as error:
-            #TODO USE LOGGER
+            logger.error("While using the XML vertex node parser:")
+            logger.error("the list of momenta,field IDs and types do not match in length")
+            logger.error("in the vertex node:")
+            logger.error(vertex_node)
             raise
         return zip(types,fields,momenta)
 
@@ -74,7 +81,7 @@ class Diagram_Vertex(object):
     parsers = {"XML": parse_xml_vertex_node}
 
     def __init__(self,vertex_node,model,mode="XML"):
-        """Constructor for a Diagram_Vertex object.
+        """Constructor for a DiagramVertex object.
 
         Parameters
         ----------
@@ -90,7 +97,7 @@ class Diagram_Vertex(object):
         vertex_fields = self.parsers[mode](vertex_node)
         self.fields = []
         for field in vertex_fields:
-            self.fields.append(Diagram_Field(*field))
+            self.fields.append(DiagramField(*field))
         self.interaction = model.interactions[[field.name for field in self.fields]]
 
     def generate_expression(self,*,line=None):
@@ -106,4 +113,18 @@ class Diagram_Vertex(object):
         str
             the expression of the feynman rule for this vertex
         """
-        return self.interaction.generate_feynman_rule(self.fields,line=line)
+        try:
+            self.interaction.generate_feynman_rule(self.fields,line=line)
+        except (ValueError,KeyError) as error:
+            logger.error("Error when generating the feynman rule for the following DiagramVertex in line {}".format(line))
+            logger.error(self)
+            logger.error(error)
+            raise
+    def nice_string(self):
+        return "DiagramVertex: {}".format(tuple(self.fields))
+    def short_string(self):
+        return str(tuple(self.fields))
+    def __repr__(self):
+        return self.short_string()
+    def __str__(self):
+        return self.nice_string()

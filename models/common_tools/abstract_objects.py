@@ -1,4 +1,7 @@
 from itertools import permutations
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AbstractObjectDict(object):
     """Dictionnary-like class with iteration over values
@@ -28,14 +31,20 @@ class AbstractObjectDict(object):
 
     def append(self,obj):
         if not isinstance(obj, self._type):
-            raise TypeError("All elements in a " + str(type(self)) + " need to be of type " + _type)
+            message = "All elements in a " + str(type(self)) + " need to be of type " + _type
+            logger.error(message)
+            raise TypeError(message)
         if obj.name in self.internal_dict:
-            raise KeyError("This object name exists already in the dictionnary {}: {}".format(str(self),obj.name))
+            message = "This object name exists already in the dictionnary {}: {}".format(self,obj)
+            logger.error(message)
+            raise KeyError(message)
         self.internal_dict[obj.name]=obj
 
     def __init__(self,list_of_objects):
         if self._type is None:
-            raise NotImplementedError("Use a specific daughter class of AbstractObjectDictionnary")
+            message = "Use a specific daughter class of AbstractObjectDictionnary"
+            logger.error(message)
+            raise NotImplementedError(message)
         self.internal_dict={}
         for obj in list_of_objects:
             self.append(obj)
@@ -58,9 +67,9 @@ class AbstractObjectDict(object):
         key = next(self._iterator)
         return self[key]
     def __repr__(self):
-        return repr(list(self.internal_dict.keys()))
+        return repr(list(self.internal_dict.values()))
     def __str__(self):
-        return str(list(self.internal_dict.keys()))
+        return str(list(self.internal_dict.values()))
 
 
 
@@ -113,7 +122,7 @@ class Parameter(str):
         if complex_conjugate is None:
             new_coupling.complex_conjugate = new_coupling.__str__()  # The default assumption is a real parameter
         else:
-            assert isinstance(complex_conjugate,str) #Allow for couplings but force a string child
+            assert isinstance(complex_conjugate,str) #Allow for couplings but force a string
             new_coupling.complex_conjugate = complex_conjugate
         return new_coupling
 
@@ -162,7 +171,9 @@ class Particle:
         for key in kwargs:
             self.__setattr__(key,kwargs[key])
     def __str__(self):
-        print("Particle: {p.name}".format(p=self))
+        return "Particle: {p.name}".format(p=self)
+    def __repr__(self):
+        return self.name
 
 
 class ParticleDict(AbstractObjectDict):
@@ -192,7 +203,7 @@ class Interaction(object):
 
         Parameters
         ----------
-        fields: list of qgraf_parser.diagram_elements.Diagram_Field
+        fields: list of qgraf_parser.diagram_elements.DiagramField
             list of fields
         line: str,optional
             the fermion line
@@ -209,8 +220,28 @@ class Interaction(object):
                 field_index_mapper[field.name].append(field.id)
             else:
                 field_index_mapper[field.name]=[field.id]
+        try:
+            feynman_rule = self.feynman_rule(field_index_mapper,line=line)
+        except (ValueError,KeyError) as error:
+            logger.error("Error when generating feynman rule for Interaction:")
+            logger.error(str(self))
+            logger.error("With the following field mapping:")
+            logger.error(str(field_index_mapper))
+            logger.error("And the fermion line {}".format(line))
+            logger.error(error)
+            raise
 
-        return self.feynman_rule(field_index_mapper,line=line)
+        return feynman_rule
+
+    def nice_string(self):
+        return "Interaction: ({})".format(self.name)
+    def short_string(self):
+        return "({})".format(self.name)
+    def __str__(self):
+        return self.nice_string()
+    def __repr__(self):
+        return self.short_string()
+
 
 class InteractionDict(AbstractObjectDict):
     """Container for Interactions. Inherits from AbstractObjectDict
@@ -231,7 +262,11 @@ class InteractionDict(AbstractObjectDict):
         if isinstance(item,str):
             return self.internal_dict[item]
         else:
-            assert isinstance(item,list)
+            try:
+                assert isinstance(item,list)
+            except TypeError as t:
+                message = "InteractionDict elements can be accessed using strings or lists as keys. Here a {} was used".format(type(item))
+                logger.error("")
             orderings = list(permutations(item))
             for ordering in orderings:
                 if ",".join(ordering) in self.internal_dict:
