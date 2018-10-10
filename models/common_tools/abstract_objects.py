@@ -144,32 +144,33 @@ class Particle:
     mass : Parameter
     spin : int
         Dimensionality of the spin state space, i.e. spin = 2*S+1
-
-    Notes
-    -----
-    I commented out the functionnalities to have an attribute
-    anti_particle: Particle
-    which can also relate to itself if the particle is self-conjugate and be NotImplemented if the theory does not have anti particles (eg NR stuff)
     """
 
-    def __init__(self, name, *, mass, spin=0, **kwargs): #anti_particle = NotImplemented
+    def __init__(self, name, *, mass, spin=0, self_conjugate=False): #anti_particle = NotImplemented
         """
         Parameters
         ----------
         name : str
         mass : Parameter
         spin : int
-        kwargs : dict
+        self_conjugate : bool
         """
         self.name = str(name)
         self.mass = mass
         self.spin = spin
-        # self.anti_particle = anti_particle
-        # if self.anti_particle=None:
-        #     self.anti_particle = self
+        self.self_conjugate = self_conjugate
 
-        for key in kwargs:
-            self.__setattr__(key,kwargs[key])
+    def anti_particle(self):
+        if self.self_conjugate:
+            return self
+        else:
+            if self.name[-3:] == "bar":
+                anti_name = self.name[:-3]
+            else:
+                anti_name = self.name+"bar"
+
+            return self.__class__(anti_name,mass=self.mass,spin=self.spin,self_conjugate=self.self_conjugate)
+
     def __str__(self):
         return "Particle: {p.name}".format(p=self)
     def __repr__(self):
