@@ -56,6 +56,7 @@ class DiagramField(object):
 
 class DiagramVertex(object):
     """Specific vertex in a Feynman diagram
+
     TODO DOC
     Attributes
     ----------
@@ -66,7 +67,9 @@ class DiagramVertex(object):
 
     @staticmethod
     def parse_xml_vertex_node(vertex_node):
-        """ Load the relevant data of a XML vertex node. This method is accessible through the class attribute `parsers` by calling cls.parsers['XML']
+        """ Load the relevant data of a XML vertex node.
+
+        This method is accessible through the class attribute `parsers` by calling cls.parsers['XML']
 
         Parameters
         ----------
@@ -113,6 +116,7 @@ class DiagramVertex(object):
         mode : str
             specification of how to read the vertex_node. The default refers to a node in a XML filed using
             xml.etree.[].XML
+        TODO HANDLE EXCEPTIONS
         """
 
         vertex_fields = self.parsers[mode](vertex_node)
@@ -144,7 +148,9 @@ class DiagramVertex(object):
             raise
 
     def access_field_by_id(self,field_id):
-        """Lookup an id in the vertex fields and return whether it is contained. If the id is an integer, process it to match our string conventions.
+        """ Lookup an id in the vertex fields and return whether it is contained.
+
+        If the id is an integer, process it to match our string conventions.
 
         Parameters
         ----------
@@ -266,3 +272,55 @@ class DiagramPropagator(object):
         # TODO  This method should be a member of models.common_tools.abstract_objects.Particle
         raise NotImplementedError
 
+class Diagram(object):
+    """Specific diagram in a QGRAF output
+
+    TODO DOC
+    """
+
+    @staticmethod
+    def parse_xml_diagram_node(diagram_node):
+        """
+
+        Parameters
+        ----------
+        diagram_node :
+
+        Returns
+        -------
+        TODO HANDLE EXCEPTIONS
+        TODO DOC
+        """
+        id = diagram_node.find("id").text
+        vertices = diagram_node.find("vertices").findall("vertex")
+        propagators = diagram_node.find("propagators").findall("propagator")
+        legs = diagram_node.find("legs").findall("legs")
+        return (id,legs,vertices,propagators)
+
+    # The class attribute `parsers` is a dictionnary of methods that can cast an object created by reading a file input
+    # describing a diagram and outputs a quadruplet (id,legs,vertices,propagators)
+    parsers = {"XML": parse_xml_diagram_node}
+
+    def __init__(self,diagram_node,model,mode="XML"):
+        """Constructor for a Diagram object.
+
+        Parameters
+        ----------
+        diagram_node : xml.etree.ElementTree.Element
+            the node of the diagram output by QGRAF representing a specific diagram
+        model : module
+            the module defining the model properties
+        mode : str
+            specification of how to read the diagram_node. The default refers to a node in a XML filed using
+            xml.etree.[].XML
+        TODO HANDLE EXCEPTIONS
+        """
+        id,legs,vertices,propagators = self.parsers[mode](diagram_node)
+        self.id=id
+        self.external_fields = [DiagramField(leg) for leg in legs]
+        self.vertices = [DiagramVertex(vertex) for vertex in vertices]
+        self.propagators = [DiagramPropagator(propagator) for propagator in propagators]
+        self.expression = NotImplemented
+
+    def generate_expression(self):
+        return NotImplemented
