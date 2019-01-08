@@ -14,11 +14,64 @@ class DiagramField(object):
         model : module
         """
         self.name = name
-        self.id = str(abs(field_id))
+        self.id = str(abs(int(field_id)))
         self.momentum = momentum
-        if field_id<0:
+        if int(field_id)<0:
             self.id = "ext"+self.id
         self.particle = model.particles[name]
+
+    @staticmethod
+    def parse_xml_external_leg(external_leg_node):
+        """TODO DOC
+        Parameters
+        ----------
+        external_leg_node :
+
+        Returns
+        -------
+
+        """
+        name=external_leg_node.find("field").text
+        field_id=external_leg_node.find("id").text
+        momentum=external_leg_node.find("momentum").text
+        return (name, field_id, momentum)
+
+    @classmethod
+    def parse(cls,external_leg_node,mode='XML'):
+        """TODO DOC
+
+        Parameters
+        ----------
+        external_leg_node :
+        mode :
+
+        Returns
+        -------
+
+        """
+        if mode=='XML':
+            return cls.parse_xml_external_leg(external_leg_node)
+        else:
+            error = IOError("{} is not a valid input mode for DiagramField".format(mode))
+            logger.error(error)
+            raise error
+
+    @classmethod
+    def create_leg_from_node(cls,external_leg_node,model,mode='XML'):
+        """Alternate constructor: from a <leg> node
+
+        TODO DOC
+        Parameters
+        ----------
+        external_leg_node :
+        mode :
+
+        Returns
+        -------
+
+        """
+        cls(*cls.parse(external_leg_node,mode),model)
+
 
     def matches_id(self,field_id):
         """Check if a given field ID matches this field
@@ -102,7 +155,25 @@ class DiagramVertex(object):
 
     # The class attribute `parsers` is a dictionnary of methods that can cast an object created by reading a file input
     # describing a vertex and outputs a list of triplets [type,field_id,momentum]
-    parsers = {"XML": parse_xml_vertex_node}
+
+    @classmethod
+    def parse(cls,vertex_node,mode):
+        """
+        TODO DOC
+        Parameters
+        ----------
+        mode :
+
+        Returns
+        -------
+
+        """
+        if mode=='XML':
+            return cls.parse_xml_vertex_node(vertex_node)
+        else:
+            error = IOError("{} is not a valid input mode for DiagramVertex".format(mode))
+            logger.error(error)
+            raise error
 
     def __init__(self,vertex_node,model,mode="XML"):
         """Constructor for a DiagramVertex object.
@@ -119,10 +190,10 @@ class DiagramVertex(object):
         TODO HANDLE EXCEPTIONS
         """
 
-        vertex_fields = self.parsers[mode](vertex_node)
+        vertex_fields = self.parse(vertex_node,mode)
         self.fields = {}
         for field in vertex_fields:
-            diagfield = DiagramField(*field)
+            diagfield = DiagramField(*field,model)
             self.fields.update({diagfield.id:diagfield})
         self.interaction = model.interactions[[field.name for field in self.fields.values()]]
 
@@ -196,9 +267,9 @@ class DiagramVertex(object):
         raise error
 
     def nice_string(self):
-        return "DiagramVertex: {}".format(tuple(self.fields))
+        return "DiagramVertex: {}".format(tuple(self.fields.values()))
     def short_string(self):
-        return str(tuple(self.fields))
+        return str(tuple(self.fields.values()))
     def __repr__(self):
         return self.short_string()
     def __str__(self):
@@ -213,9 +284,25 @@ class DiagramPropagator(object):
     def parse_xml_propagator_node(propagator_node):
         """TODO DOC"""
         raise NotImplementedError
-        # The class attribute `parsers` is a dictionnary of methods that can cast an object created by reading a file input
-    # describing a propagator and outputs a list of ... TODO
-    parsers = {"XML": parse_xml_propagator_node}
+
+    @classmethod
+    def parse(cls,propagator_node,mode):
+        """
+        TODO DOC
+        Parameters
+        ----------
+        mode :
+
+        Returns
+        -------
+
+        """
+        if mode=='XML':
+            return cls.parse_xml_propagator_node(propagator_node)
+        else:
+            error = IOError("{} is not a valid input mode for DiagramPropagator".format(mode))
+            logger.error(error)
+            raise error
 
     def __init__(self,propagator_node,fields,model,mode="XML"):
         """Constructor for a DiagramPropagator object.
@@ -232,7 +319,7 @@ class DiagramPropagator(object):
             specification of how to read the vertex_node. The default refers to a node in a XML filed using
             xml.etree.[].XML
         """
-        propagator_data = self.parsers[mode](propagator_node)
+        propagator_data = self.parse(propagator_node,mode)
         # Get the from field
         from_id = propagator_data['from']
         found_froms = [field for field in fields if field.matches_id(from_id)]
@@ -248,7 +335,7 @@ class DiagramPropagator(object):
             logger.error(fields)
             logger.error(error)
             raise error
-        self.from = found_froms[0]
+        self.from_field = found_froms[0]
 
         # Get the to field
         to_id = propagator_data['to']
@@ -265,11 +352,11 @@ class DiagramPropagator(object):
             logger.error(fields)
             logger.error(error)
             raise error
-        self.to = found_tos[0]
+        self.to_field = found_tos[0]
 
         # TODO Now need to implement the function that writes a propagator
-        # TODO finish initialization with a dynamically assigned method to write the FORM propagator.
-        # TODO  This method should be a member of models.common_tools.abstract_objects.Particle
+        # TODO Finish initialization with a dynamically assigned method to write the FORM propagator.
+        # TODO This method should be a member of models.common_tools.abstract_objects.Particle
         raise NotImplementedError
 
 class Diagram(object):
@@ -294,12 +381,27 @@ class Diagram(object):
         id = diagram_node.find("id").text
         vertices = diagram_node.find("vertices").findall("vertex")
         propagators = diagram_node.find("propagators").findall("propagator")
-        legs = diagram_node.find("legs").findall("legs")
+        legs = diagram_node.find("legs").findall("leg")
         return (id,legs,vertices,propagators)
 
-    # The class attribute `parsers` is a dictionnary of methods that can cast an object created by reading a file input
-    # describing a diagram and outputs a quadruplet (id,legs,vertices,propagators)
-    parsers = {"XML": parse_xml_diagram_node}
+    @classmethod
+    def parse(cls,diagram_node,mode):
+        """
+        TODO DOC
+        Parameters
+        ----------
+        mode :
+
+        Returns
+        -------
+
+        """
+        if mode=='XML':
+            return cls.parse_xml_diagram_node(diagram_node)
+        else:
+            error = IOError("{} is not a valid input mode for Diagram".format(mode))
+            logger.error(error)
+            raise error
 
     def __init__(self,diagram_node,model,mode="XML"):
         """Constructor for a Diagram object.
@@ -315,11 +417,18 @@ class Diagram(object):
             xml.etree.[].XML
         TODO HANDLE EXCEPTIONS
         """
-        id,legs,vertices,propagators = self.parsers[mode](diagram_node)
+        # TODO DEV remove this debug before pushing
+        import ipdb
+        ipdb.set_trace()
+        # TODO DEV end of debug statement
+        id,legs,vertices,propagators = self.parse(diagram_node,mode)
         self.id=id
-        self.external_fields = [DiagramField(leg) for leg in legs]
-        self.vertices = [DiagramVertex(vertex) for vertex in vertices]
-        self.propagators = [DiagramPropagator(propagator) for propagator in propagators]
+        self.external_fields = [DiagramField.create_leg_from_node(leg,model,mode) for leg in legs]
+        self.vertices = [DiagramVertex(vertex,model,mode) for vertex in vertices]
+        self.fields = {}
+        for v_fields in [v.fields for v in self.vertices]:
+            self.fields.update(v_fields)
+        self.propagators = [DiagramPropagator(propagator, self.fields.values(), model, mode) for propagator in propagators]
         self.expression = NotImplemented
 
     def generate_expression(self):
