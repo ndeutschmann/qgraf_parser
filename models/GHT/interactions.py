@@ -12,9 +12,10 @@ Higgs = particles['H']
 
 # Interactions
 txtH =Interaction([topx,top,Higgs],FR.txtH)
-ggg = Interaction([gluon,gluon,gluon],FR.ggg)
-txtg = Interaction([topx,top,gluon],FR.txtg)
+# ggg = Interaction([gluon,gluon,gluon],FR.ggg)
+# txtg = Interaction([topx,top,gluon],FR.txtg)
 
 # Bundle it all up
-interactions = InteractionDict([ggg,txtg,txtH])
+# interactions = InteractionDict([ggg,txtg,txtH])
+interactions = InteractionDict([txtH])
 
