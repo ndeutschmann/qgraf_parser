@@ -1,5 +1,22 @@
-import logging
+"""Abstract representations of the elements of Feynman diagrams
 
+The elements are the following
+- DiagramField objects are the individual fields that attach to interaction vertices or propagators. They are in one to
+one correspondance with the notion of fields in QGRAF
+- DiagramVertex objects are vertices. They contain a list of fields that are attached to them (internal or external).
+The code is designed such that DiagramVertex are generated first and used to generate the list of fields in the diagram
+- DiagramPropagator objects represent propagators. Their field objects are picked from the list generated when parsing the
+vertices
+- Diagram objects represent entire diagrams and as such contain a list of Fields, Vertices and Propagators. Note that
+the list of fields is obtained from the Vertices, such that each field should have a unique object representing it.
+At the moment there is however no actual protections or checks to ensure that this is the case.
+
+Vertex and Propagators are the elements that have a feynman rule attached to them, they are therefore generated with a
+model, which is then searched to attach the corresponding Interaction/Propagator object
+(qgraf_parser.models.common_tools.abstract_objects.Interaction or [...].Propagator)
+"""
+
+import logging
 logger=logging.getLogger(__name__)
 
 class DiagramField(object):
