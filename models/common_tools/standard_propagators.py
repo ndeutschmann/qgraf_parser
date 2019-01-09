@@ -27,7 +27,7 @@ def scalar_propagator(momentum,mass):
     -------
     str
     """
-    return times(i_,standard_denominator(momentum,mass))
+    return times("i_",standard_denominator(momentum,mass))
 
 def fermionic_propagator(from_field,to_field,momentum,mass):
     """Kinematic part of a standard fermionic propagator
@@ -44,7 +44,7 @@ def fermionic_propagator(from_field,to_field,momentum,mass):
     str
     """
     spinhalf_numerator = "g({p},x{psi},x{psibar}) + {m}*g(x{psi},x{psibar})".format(p=momentum,psi=from_field,psibar=to_field,m=mass)
-    propagator = times(i_,spinhalf_numerator,standard_denominator(momentum,mass))
+    propagator = times("i_",spinhalf_numerator,standard_denominator(momentum,mass))
     return propagator
 
 def quark_propagator(from_field,to_field,momentum,mass):

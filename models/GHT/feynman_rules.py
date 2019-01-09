@@ -73,6 +73,6 @@ def top_prop(from_field,to_field,momentum):#TODO refactor propagators to label f
     -------
     str
     """
-    return quark_propagator(to_field.id,from_field.id,to_field.mass,momentum)
+    return quark_propagator(to_field.id,from_field.id,momentum,to_field.particle.mass)
 
 

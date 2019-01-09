@@ -15,7 +15,7 @@ Vertex and Propagators are the elements that have a feynman rule attached to the
 model, which is then searched to attach the corresponding Interaction/Propagator object
 (qgraf_parser.models.common_tools.abstract_objects.Interaction or [...].Propagator)
 """
-
+from .models.common_tools.algebra_tools import times
 import logging
 logger=logging.getLogger(__name__)
 
@@ -226,7 +226,7 @@ class DiagramVertex(object):
             the expression of the feynman rule for this vertex
         """
         try:
-            self.interaction.generate_feynman_rule(self.fields.values(),line=line)
+            return self.interaction.generate_feynman_rule(self.fields.values())
         except (ValueError,KeyError) as error:
             logger.error("Error when generating the feynman rule for the following DiagramVertex in line {}".format(line))
             logger.error(self)
@@ -305,7 +305,8 @@ class DiagramPropagator(object):
         to_field = propagator_node.find("field").text
         from_index = propagator_node.find("from").text
         to_index = propagator_node.find("to").text
-        return (from_field,from_index,to_field,to_index)
+        momentum = propagator_node.find("momentum").text
+        return (from_field,from_index,to_field,to_index,momentum)
 
     @classmethod
     def parse(cls,propagator_node,mode):
@@ -341,9 +342,10 @@ class DiagramPropagator(object):
             specification of how to read the vertex_node. The default refers to a node in a XML filed using
             xml.etree.[].XML
         """
-        (from_field, from_index, to_field, to_index) = self.parse(propagator_node,mode)
+        (from_field, from_index, to_field, to_index,momentum) = self.parse(propagator_node,mode)
         self.from_field = fields[from_index]
         self.to_field = fields[to_index]
+        self.momentum = momentum
         self.propagator = model.propagators[[from_field,to_field]]
 
         ### SANITY CHECKS
@@ -360,6 +362,25 @@ class DiagramPropagator(object):
             logger.error(e)
             raise
         ####################
+
+    def generate_expression(self):
+        """ Call the interaction feynman rule generation routines with
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        str
+            the expression of the feynman rule for this vertex
+        """
+        try:
+            return self.propagator.generate_feynman_rule([self.from_field,self.to_field],self.momentum)
+        except (ValueError,KeyError) as error:
+            logger.error("Error when generating the feynman rule for the following DiagramPropagator")
+            logger.error(self)
+            logger.error(error)
+            raise
 
 class Diagram(object):
     """Specific diagram in a QGRAF output
@@ -430,4 +451,6 @@ class Diagram(object):
         self.expression = NotImplemented
 
     def generate_expression(self):
-        return NotImplemented
+        vertices = [v.generate_expression() for v in self.vertices]
+        propagators = [p.generate_expression() for p in self.propagators]
+        return times(*(vertices+propagators))
