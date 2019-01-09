@@ -31,7 +31,7 @@ def generate_XML_diagrams_node(file_path):
     """
     return XML(default_loader(file_path, parse)).find("diagrams")
 
-def create_diagrams_from_XML(file_path):
+def create_diagrams_from_XML(file_path,model,mode='XML'):
     """Generate a list of Diagrams objects from XML file
 
     Parameters
@@ -45,4 +45,4 @@ def create_diagrams_from_XML(file_path):
     """
 
     diagrams_node = generate_XML_diagrams_node(file_path)
-    return [Diagram(diag) for diag in diagrams_node.findall("diagram")]
+    return [Diagram(diag,model,mode) for diag in diagrams_node.findall("diagram")]
