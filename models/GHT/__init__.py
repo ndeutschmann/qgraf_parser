@@ -2,3 +2,5 @@
 from .parameters import parameters
 from .particles import particles
 from .interactions import interactions
+import logging
+logger = logging.getLogger(__name__)

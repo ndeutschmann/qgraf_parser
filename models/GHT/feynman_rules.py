@@ -1,7 +1,8 @@
 #TODO use parameters instead of string litterals!
-#TODO use the info on the particle ids based
+#TODO use fields instead of ids in the input
 """Implementation of the vertices of the GHT model"""
 from ..common_tools.algebra_tools import *
+from ..common_tools.standard_propagators import *
 import logging
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,9 @@ def ggg(field_index_mapper,line=None):
         all_p_i1_minus_p_i2.append(times(delta_i1_i2,p))
     return times(prefactor,f_b1_b2_b3,*all_p_i1_minus_p_i2)
 
-
-
+def ttx_prop(field_index_mapper):
+    tx =field_index_mapper['tbar'][0]
+    t = field_index_mapper['t'][0]
+    quark_propagator(t,tx)
 
 

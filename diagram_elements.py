@@ -322,7 +322,7 @@ class DiagramPropagator(object):
         propagator_data = self.parse(propagator_node,mode)
         # Get the from field
         from_id = propagator_data['from']
-        found_froms = [field for field in fields if field.matches_id(from_id)]
+        found_froms = [field for field in fields if field.matches_id(from_id)]#TODO simply use the fields dictionnary created in Diagram. Also avoids the error handling logic below
         if len(found_froms) == 0:
             error = ValueError("From field of a propagator not found")
             logger.error("The From field id {} was not found in the field list".format(from_id))
@@ -339,7 +339,7 @@ class DiagramPropagator(object):
 
         # Get the to field
         to_id = propagator_data['to']
-        found_tos = [field for field in fields if field.matches_id(to_id)]
+        found_tos = [field for field in fields if field.matches_id(to_id)]#TODO simply use the fields dictionnary created in Diagram. Also avoids the error handling logic below
         if len(found_tos) == 0:
             error = ValueError("To field of a propagator not found")
             logger.error("The To field id {} was not found in the field list".format(to_id))
@@ -417,10 +417,6 @@ class Diagram(object):
             xml.etree.[].XML
         TODO HANDLE EXCEPTIONS
         """
-        # TODO DEV remove this debug before pushing
-        import ipdb
-        ipdb.set_trace()
-        # TODO DEV end of debug statement
         id,legs,vertices,propagators = self.parse(diagram_node,mode)
         self.id=id
         self.external_fields = [DiagramField.create_leg_from_node(leg,model,mode) for leg in legs]

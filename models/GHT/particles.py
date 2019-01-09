@@ -1,5 +1,7 @@
 from ..common_tools.abstract_objects import Particle,ParticleDict
 from .parameters import parameters as p
+import logging
+logger = logging.getLogger(__name__)
 
 # Particle definitions
 H    = Particle("H",mass=p["mh"],spin=0)

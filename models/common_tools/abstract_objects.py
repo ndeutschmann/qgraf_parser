@@ -201,7 +201,7 @@ class Interaction(object):
         self.name = ",".join([particle.name for particle in particles])
     def generate_feynman_rule(self,fields,*,line=None):
         """Create a string corresponding to the feynman rule for the qgraf_parser Vertex vertex
-
+        TODO: rewrite this to reflect our abandonning lines
         Parameters
         ----------
         fields: list of qgraf_parser.diagram_elements.DiagramField
@@ -224,7 +224,7 @@ class Interaction(object):
         try:
             feynman_rule = self.feynman_rule(field_index_mapper,line=line)
         except (ValueError,KeyError) as error:
-            logger.error("Error when generating feynman rule for Interaction:")
+            logger.error("Error when generating feynman rule for {}:".format(type(self).__name__)) #Support children classes
             logger.error(str(self))
             logger.error("With the following field mapping:")
             logger.error(str(field_index_mapper))
@@ -235,7 +235,7 @@ class Interaction(object):
         return feynman_rule
 
     def nice_string(self):
-        return "Interaction: ({})".format(self.name)
+        return "{}: ({})".format(type(self).__name__,self.name) #Support children classes
     def short_string(self):
         return "({})".format(self.name)
     def __str__(self):
@@ -266,7 +266,7 @@ class InteractionDict(AbstractObjectDict):
             try:
                 assert isinstance(item,list)
             except TypeError as t:
-                message = "InteractionDict elements can be accessed using strings or lists as keys. Here a {} was used".format(type(item))
+                message = "{} elements can be accessed using strings or lists as keys. Here a {} was used".format(type(self).__name__,type(item))
                 logger.error("")
             orderings = list(permutations(item))
             for ordering in orderings:
@@ -274,7 +274,13 @@ class InteractionDict(AbstractObjectDict):
                     break
             return self.internal_dict[",".join(ordering)]
 
+class Propagator(Interaction):
+    __doc__='Trivial child class of Interaction to semantically separate propagators as a special type of interactions\n\n'+Interaction.__doc__
+    pass
 
+class PropagatorDict(InteractionDict):
+    __doc__="Trivial child class of InteractionDict to semantically separate propagators as a special type of interactions\n\n"+InteractionDict.__doc__
+    pass
 
 
 #####################################################################

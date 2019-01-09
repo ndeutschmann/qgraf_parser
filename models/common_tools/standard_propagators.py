@@ -60,4 +60,5 @@ def quark_propagator(from_field,to_field,momentum,mass):
     Returns
     -------
     str
+    """
     return times(fermionic_propagator(from_field,to_field,momentum,mass),"d_(i{psi},i{psibar})".format(psi=from_field.id,psibar=to_field.id))

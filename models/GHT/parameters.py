@@ -1,4 +1,6 @@
 from ..common_tools.abstract_objects import Parameter,ParameterDict,zero
+import logging
+logger = logging.getLogger(__name__)
 
 # Parameter definitions
 g = Parameter('g', name='gs', info='strong coupling constant')

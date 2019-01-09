@@ -1,6 +1,8 @@
 from ..GHT import feynman_rules as FR
 from .particles import particles
 from ..common_tools.abstract_objects import Interaction, InteractionDict
+import logging
+logger = logging.getLogger(__name__)
 
 # Particle names
 gluon = particles['g']
