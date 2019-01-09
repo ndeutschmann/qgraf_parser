@@ -34,8 +34,8 @@ def fermionic_propagator(from_field,to_field,momentum,mass):
 
     Parameters
     ----------
-    from_field : qgraf_parser.diagram_elements.DiagramField
-    to_field : qgraf_parser.diagram_elements.DiagramField
+    from_field : str
+    to_field : str
     momentum : str
     mass : .abstract_objects.Parameters
 
@@ -43,7 +43,7 @@ def fermionic_propagator(from_field,to_field,momentum,mass):
     -------
     str
     """
-    spinhalf_numerator = "g({p},x{psi},x{psibar}) + {m}*g(x{psi},x{psibar})".format(p=momentum,psi=from_field.id,psibar=to_field.id,m=mass)
+    spinhalf_numerator = "g({p},x{psi},x{psibar}) + {m}*g(x{psi},x{psibar})".format(p=momentum,psi=from_field,psibar=to_field,m=mass)
     propagator = times(i_,spinhalf_numerator,standard_denominator(momentum,mass))
     return propagator
 
@@ -52,8 +52,8 @@ def quark_propagator(from_field,to_field,momentum,mass):
 
     Parameters
     ----------
-    from_field : qgraf_parser.diagram_elements.DiagramField
-    to_field : qgraf_parser.diagram_elements.DiagramField
+    from_field : str
+    to_field : str
     momentum : str
     mass : .abstract_objects.Parameters
 
@@ -61,4 +61,4 @@ def quark_propagator(from_field,to_field,momentum,mass):
     -------
     str
     """
-    return times(fermionic_propagator(from_field,to_field,momentum,mass),"d_(i{psi},i{psibar})".format(psi=from_field.id,psibar=to_field.id))
+    return times(fermionic_propagator(from_field,to_field,momentum,mass),"d_(i{psi},i{psibar})".format(psi=from_field,psibar=to_field))

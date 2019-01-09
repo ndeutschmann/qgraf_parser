@@ -201,7 +201,6 @@ class Interaction(object):
         self.name = ",".join([particle.name for particle in particles])
     def generate_feynman_rule(self,fields,*,line=None):
         """Create a string corresponding to the feynman rule for the qgraf_parser Vertex vertex
-        TODO: rewrite this to reflect our abandonning lines
         Parameters
         ----------
         fields: list of qgraf_parser.diagram_elements.DiagramField
@@ -218,17 +217,16 @@ class Interaction(object):
         field_index_mapper = {}
         for field in fields:
             if field.name in field_index_mapper:
-                field_index_mapper[field.name].append(field.id)
+                field_index_mapper[field.name].append(field)
             else:
-                field_index_mapper[field.name]=[field.id]
+                field_index_mapper[field.name]=[field]
         try:
-            feynman_rule = self.feynman_rule(field_index_mapper,line=line)
+            feynman_rule = self.feynman_rule(field_index_mapper)
         except (ValueError,KeyError) as error:
             logger.error("Error when generating feynman rule for {}:".format(type(self).__name__)) #Support children classes
             logger.error(str(self))
             logger.error("With the following field mapping:")
             logger.error(str(field_index_mapper))
-            logger.error("And the fermion line {}".format(line))
             logger.error(error)
             raise
 
