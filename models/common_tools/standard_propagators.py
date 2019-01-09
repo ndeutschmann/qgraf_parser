@@ -1,5 +1,6 @@
 """A collection of standard Feynman rules for propagators"""
 from .algebra_tools import *
+from .abstract_objects import I
 
 def standard_denominator(momentum,mass):
     """The common 1/(p^2-m^2) denominator in all Lorentz-invariant QFTs.
@@ -27,7 +28,7 @@ def scalar_propagator(momentum,mass):
     -------
     str
     """
-    return times("i_",standard_denominator(momentum,mass))
+    return times(I,standard_denominator(momentum,mass))
 
 def fermionic_propagator(from_field,to_field,momentum,mass):
     """Kinematic part of a standard fermionic propagator
@@ -44,7 +45,7 @@ def fermionic_propagator(from_field,to_field,momentum,mass):
     str
     """
     spinhalf_numerator = "g({p},x{psi},x{psibar}) + {m}*g(x{psi},x{psibar})".format(p=momentum,psi=from_field,psibar=to_field,m=mass)
-    propagator = times("i_",spinhalf_numerator,standard_denominator(momentum,mass))
+    propagator = times(I,spinhalf_numerator,standard_denominator(momentum,mass))
     return propagator
 
 def quark_propagator(from_field,to_field,momentum,mass):

@@ -342,3 +342,4 @@ class PropagatorDict(AbstractObjectDict):
 #####################################################################
 
 zero = Parameter("zero")
+I = Parameter("i_")
