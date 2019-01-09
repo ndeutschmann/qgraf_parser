@@ -1,0 +1,72 @@
+<qgraf>
+<version>qgraf-3.3</version>
+<input> output = 'yukex.xml' ;style = 'xml.sty' ;model = 'chromomag' ;in = H ;out = H;loops = 1 ;loop_momentum = k ;options = onshell;true = iprop[H,0,0];</input>
+<diagrams>
+ 
+<diagram>
+
+ <id>1</id>
+ <defdata>
+  <incoming>
+  1
+  </incoming>
+  <outgoing>
+  1
+  </outgoing>
+ </defdata>
+ <signsym>-1</signsym>
+
+ <legs>
+  <leg>
+   <field>H</field>
+   <momentum>p1</momentum>
+   <status>in</status>
+   <id>-1</id>
+  </leg>
+  <leg>
+   <field>H</field>
+   <momentum>q1</momentum>
+   <status>out</status>
+   <id>-2</id>
+  </leg>
+ </legs>
+
+<propagators>
+  <propagator>
+   <mass>mt</mass>
+   <momentum>k1-p1</momentum>
+   <field>t</field>
+   <dual-field>tbar</dual-field>
+   <id>1</id>
+   <from>2</from>
+   <to>1</to>
+  </propagator>
+  <propagator>
+   <mass>mt</mass>
+   <momentum>k1</momentum>
+   <field>t</field>
+   <dual-field>tbar</dual-field>
+   <id>2</id>
+   <from>4</from>
+   <to>3</to>
+  </propagator>
+ </propagators>
+
+ <vertices>
+  <vertex>
+   <type>tbar,t,H</type>
+   <fields>4,1,-1</fields>
+   <id>1</id>
+   <momenta>-k1,k1-p1,p1</momenta>
+  </vertex>
+  <vertex>
+   <type>tbar,t,H</type>
+   <fields>2,3,-2</fields>
+   <id>2</id>
+   <momenta>-k1+p1,k1,-q1</momenta>
+  </vertex>
+ </vertices>
+</diagram>
+</diagrams>
+</qgraf>
+

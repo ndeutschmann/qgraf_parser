@@ -214,13 +214,11 @@ class DiagramVertex(object):
             self.fields.update({diagfield.id:diagfield})
         self.interaction = model.interactions[[field.name for field in self.fields.values()]]
 
-    def generate_expression(self,*,line=None):
+    def generate_expression(self):
         """ Call the interaction feynman rule generation routines with
 
         Parameters
         ----------
-        line : str,optional
-            fermion line number
 
         Returns
         -------
@@ -299,8 +297,15 @@ class DiagramPropagator(object):
     """
     @staticmethod
     def parse_xml_propagator_node(propagator_node):
-        """TODO DOC"""
-        raise NotImplementedError
+        """TODO DOC
+        """
+        # I need to put in more details about propagator oriention. Here from and to refer to the flow of momentum
+        # and to the arrows for fermion propagators. The indices must therefore go in the opposite direction (to_index,from_index)
+        from_field = propagator_node.find("dual-field").text
+        to_field = propagator_node.find("field").text
+        from_index = propagator_node.find("from").text
+        to_index = propagator_node.find("to").text
+        return (from_field,from_index,to_field,to_index)
 
     @classmethod
     def parse(cls,propagator_node,mode):
@@ -328,7 +333,7 @@ class DiagramPropagator(object):
         ----------
         propagator_node : xml.etree.ElementTree.Element
             the node of the diagram output by QGRAF representing a specific vertex in a diagram
-        fields : list of DiagramFields
+        fields : dict of {str:DiagramFields}
             The vertices in the diagram - some of which could be connected to the
         model : module
             the module defining the model properties
@@ -336,45 +341,25 @@ class DiagramPropagator(object):
             specification of how to read the vertex_node. The default refers to a node in a XML filed using
             xml.etree.[].XML
         """
-        propagator_data = self.parse(propagator_node,mode)
-        # Get the from field
-        from_id = propagator_data['from']
-        found_froms = [field for field in fields if field.matches_id(from_id)]#TODO simply use the fields dictionnary created in Diagram. Also avoids the error handling logic below
-        if len(found_froms) == 0:
-            error = ValueError("From field of a propagator not found")
-            logger.error("The From field id {} was not found in the field list".format(from_id))
-            logger.error(fields)
-            logger.error(error)
-            raise error
-        elif len(found_froms) > 1:
-            error = ValueError("Several field match propagator From field")
-            logger.error("The From field id {} was found several times in the field list".format(from_id))
-            logger.error(fields)
-            logger.error(error)
-            raise error
-        self.from_field = found_froms[0]
+        (from_field, from_index, to_field, to_index) = self.parse(propagator_node,mode)
+        self.from_field = fields[from_index]
+        self.to_field = fields[to_index]
+        self.propagator = model.propagators[[from_field,to_field]]
 
-        # Get the to field
-        to_id = propagator_data['to']
-        found_tos = [field for field in fields if field.matches_id(to_id)]#TODO simply use the fields dictionnary created in Diagram. Also avoids the error handling logic below
-        if len(found_tos) == 0:
-            error = ValueError("To field of a propagator not found")
-            logger.error("The To field id {} was not found in the field list".format(to_id))
-            logger.error(fields)
-            logger.error(error)
-            raise error
-        elif len(found_tos) > 1:
-            error = ValueError("Several field match propagator To field")
-            logger.error("The To field id {} was found several times in the field list".format(to_id))
-            logger.error(fields)
-            logger.error(error)
-            raise error
-        self.to_field = found_tos[0]
-
-        # TODO Now need to implement the function that writes a propagator
-        # TODO Finish initialization with a dynamically assigned method to write the FORM propagator.
-        # TODO This method should be a member of models.common_tools.abstract_objects.Particle
-        raise NotImplementedError
+        ### SANITY CHECKS
+        try:
+            assert self.from_field.name == from_field
+        except AssertionError as e:
+            logger.error("Diagram propagator from_field read from XML does not match the DiagramField with the same index")
+            logger.error(e)
+            raise
+        try:
+            assert self.to_field.name == to_field
+        except AssertionError as e:
+            logger.error("Diagram propagator to_field read from XML does not match the DiagramField with the same index")
+            logger.error(e)
+            raise
+        ####################
 
 class Diagram(object):
     """Specific diagram in a QGRAF output
@@ -441,7 +426,7 @@ class Diagram(object):
         self.fields = {}
         for v_fields in [v.fields for v in self.vertices]:
             self.fields.update(v_fields)
-        self.propagators = [DiagramPropagator(propagator, self.fields.values(), model, mode) for propagator in propagators]
+        self.propagators = [DiagramPropagator(propagator, self.fields, model, mode) for propagator in propagators]
         self.expression = NotImplemented
 
     def generate_expression(self):

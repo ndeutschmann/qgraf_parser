@@ -199,14 +199,14 @@ class Interaction(object):
         self.particles = particles
         self.feynman_rule = feynman_rule
         self.name = ",".join([particle.name for particle in particles])
-    def generate_feynman_rule(self,fields,*,line=None):
-        """Create a string corresponding to the feynman rule for the qgraf_parser Vertex vertex
+    def generate_feynman_rule(self, fields, *args):
+        """Create a string corresponding to the Feynman rule for the qgraf_parser Vertex
         Parameters
         ----------
         fields: list of qgraf_parser.diagram_elements.DiagramField
-            list of fields
-        line: str,optional
-            the fermion line
+            list of fields connected to this vertex
+        *args:
+            feynman-rule-specific parameters
 
         Returns
         -------
@@ -221,7 +221,7 @@ class Interaction(object):
             else:
                 field_index_mapper[field.name]=[field]
         try:
-            feynman_rule = self.feynman_rule(field_index_mapper)
+            feynman_rule = self.feynman_rule(field_index_mapper,*args)
         except (ValueError,KeyError) as error:
             logger.error("Error when generating feynman rule for {}:".format(type(self).__name__)) #Support children classes
             logger.error(str(self))
@@ -273,12 +273,66 @@ class InteractionDict(AbstractObjectDict):
             return self.internal_dict[",".join(ordering)]
 
 class Propagator(Interaction):
-    __doc__='Trivial child class of Interaction to semantically separate propagators as a special type of interactions\n\n'+Interaction.__doc__
-    pass
+    """Abstract representation of a propagator"""
+    # The constructor is entirely inherited from the Interaction clas
+    # A major difference is that the order in the particle list has a meaning: [from_field,to_field]
+    def generate_feynman_rule(self, fields, momentum, *args):
+        """Create a string corresponding to the Feynman rule for the qgraf_parser Propagator
 
-class PropagatorDict(InteractionDict):
-    __doc__="Trivial child class of InteractionDict to semantically separate propagators as a special type of interactions\n\n"+InteractionDict.__doc__
-    pass
+        Parameters
+        ----------
+        fields : fields: list of qgraf_parser.diagram_elements.DiagramField
+            list of fields connected to this propagator as [from_field,to_field] in terms of particle flow (i.e. opposite to Dirac algebra index order).
+        momentum : str
+        args :
+
+        Returns
+        -------
+        str
+            the expression of the feynman rule for this interaction with a specific choice of fields and momentum.
+        """
+        # Sanity checks
+        try:
+            assert len(fields)==2
+        except AssertionError as e:
+            logger.error("Error when generating the feynman rule for Propagator {}".format(self))
+            logger.error("Input field list length is not 2. See below")
+            logger.error(fields)
+            logger.error(e)
+            raise
+
+        from_field = fields[0] # Anti-particle, start of the propagator
+        to_field = fields[1] # Particle, end of the propagator
+        feynman_rule = self.feynman_rule(from_field,to_field,momentum,*args)
+        return feynman_rule
+
+class PropagatorDict(AbstractObjectDict):
+    """Container for Propagator objects. Inherits from AbstractObjectDict
+    """
+    _type = Propagator
+    def __getitem__(self, item):
+        """Get the content of the dictionary. Two ways of doing so: either with the name of the interaction or with a
+         list of particle names. Contrary to InteractionDict objects, the ordering of the particles is meaningful
+         and therefore kept unchanged when scanning for it.
+
+        Parameters
+        ----------
+        item : str or list of str
+            interaction name or list of particle names
+
+        Returns
+        -------
+        self[item] : Interaction
+        """
+        if isinstance(item,str):
+            return self.internal_dict[item]
+        else:
+            try:
+                assert isinstance(item,list)
+            except TypeError as t:
+                message = "{} elements can be accessed using strings or lists as keys. Here a {} was used".format(type(self).__name__,type(item))
+                logger.error("")
+            return self.internal_dict[",".join(item)]
 
 
 #####################################################################

@@ -38,8 +38,8 @@ def txtH(field_index_mapper):
     tx =field_index_mapper['tbar'][0]
     t = field_index_mapper['t'][0]
     prefactor = '(-i_)*Y'
-    delta_i1_i2 = "d_(col{},col{})".format(tx.id,t.id) # color delta
-    delta_s1_s2 = "d_(s{},s{})".format(tx.id,t.id)# Dirac algebra delta
+    delta_i1_i2 = "d_(col{},col{})".format(t.id,tx.id) # color delta
+    delta_s1_s2 = "d_(s{},s{})".format(t.id,tx.id)# Dirac algebra delta
     return times(prefactor,delta_i1_i2,delta_s1_s2)
 
 # def ggg(field_index_mapper,line=None):#TODO Refactor for no lines and fields
@@ -62,19 +62,17 @@ def txtH(field_index_mapper):
 #         all_p_i1_minus_p_i2.append(times(delta_i1_i2,p))
 #     return times(prefactor,f_b1_b2_b3,*all_p_i1_minus_p_i2)
 #
-def top_prop(field_index_mapper):#TODO refactor propagators to label fields with the from/to information provided in the XML input (motivated by error mitigation)
+def top_prop(from_field,to_field,momentum):#TODO refactor propagators to label fields with the from/to information provided in the XML input (motivated by error mitigation)
     """
 
     Parameters
     ----------
-    field_index_mapper : dict of {str : qgraf_parser.diagram_elements.DiagramField}
+    FR_data_bundle : dict
 
     Returns
     -------
-
+    str
     """
-    tx =field_index_mapper['tbar'][0]
-    t = field_index_mapper['t'][0]
-    return quark_propagator(t.id,tx.id,t.mass,t.momentum)
+    return quark_propagator(to_field.id,from_field.id,to_field.mass,momentum)
 
 
