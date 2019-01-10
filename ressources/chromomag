@@ -1,0 +1,19 @@
+[ t, tbar, -]
+
+[ g, g, + , notadpole]
+
+[ H, H, + ]
+
+[ tbar, t, g ; g_power = 0 ]
+
+[ g, g, g; g_power = 0 ]
+
+[ g, g, g, g; g_power = 0 ]
+
+[ tbar, t, H ; g_power = 0 ]
+
+[ tbar, t, g, H ; g_power = 1 ]
+
+[ tbar, t, g, g ; g_power = 1 ]
+
+[ tbar, t, g, g, H ; g_power = 1 ]

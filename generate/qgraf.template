@@ -1,0 +1,17 @@
+output = '{output_file}' ;
+
+style = '{style_file}' ;
+
+model = '{model_file}' ;
+
+in = {incoming} ;
+
+out = {outgoing};
+
+loops = {n_loops} ;
+
+loop_momentum = k ;
+
+options = {options};
+
+{optional_statements}

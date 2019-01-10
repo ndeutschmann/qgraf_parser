@@ -1,0 +1,7 @@
+model_file: /Users/ndeutsch/code/qgraf_parser/qgraf_parser/ressources/chromomag
+style_file: /Users/ndeutsch/code/qgraf_parser/qgraf_parser/generate/xml.sty
+options:
+  - onshell
+qgraf_executable: /Users/ndeutsch/code/libraries/bin/qgraf
+output_file: graphs.xml
+qgraf_template: /Users/ndeutsch/code/qgraf_parser/qgraf_parser/generate/qgraf.template

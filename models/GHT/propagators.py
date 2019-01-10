@@ -19,6 +19,7 @@ Higgs = particles['H']
 #TODO To preserve the flexibility of feynman rules functions, the FR should be assigned to particles, or we can preserve
 #TODO the propagators.py and have it only initialize propagators from a single particle.
 ttx =Propagator([topx,top],FR.top_prop)
+HH = Propagator([H,H],NotImplemented)
 
 # Bundle it all up
 propagators = PropagatorDict([ttx])

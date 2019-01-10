@@ -62,17 +62,33 @@ def txtH(field_index_mapper):
 #         all_p_i1_minus_p_i2.append(times(delta_i1_i2,p))
 #     return times(prefactor,f_b1_b2_b3,*all_p_i1_minus_p_i2)
 #
-def top_prop(from_field,to_field,momentum):#TODO refactor propagators to label fields with the from/to information provided in the XML input (motivated by error mitigation)
+def top_prop(from_field,to_field,momentum):
     """
 
     Parameters
     ----------
-    FR_data_bundle : dict
+    from_field :
+    to_field :
+    momentum :
 
     Returns
     -------
-    str
+
     """
     return quark_propagator(to_field.id,from_field.id,momentum,to_field.particle.mass)
 
 
+def H_prop(from_field,to_field,momentum):
+    """
+
+    Parameters
+    ----------
+    from_field :
+    to_field :
+    momentum :
+
+    Returns
+    -------
+
+    """
+    return scalar_propagator(momentum,to_field.particle.mass)

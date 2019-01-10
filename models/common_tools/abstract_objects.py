@@ -60,16 +60,24 @@ class AbstractObjectDict(object):
 
     def __getitem__(self, item):
         return self.internal_dict[item]
+
     def __iter__(self):
         self._iterator = iter(self.internal_dict)
         return self
+
     def __next__(self):
         key = next(self._iterator)
         return self[key]
+
+    def __contains__(self,item):
+        return item in self.internal_dict
+
     def __repr__(self):
         return repr(list(self.internal_dict.values()))
+
     def __str__(self):
         return str(list(self.internal_dict.values()))
+
 
 
 

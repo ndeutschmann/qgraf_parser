@@ -1,0 +1,17 @@
+output = 'grafs' ;
+
+style = 'xmldraw.sty' ;
+
+model = 'chromomag' ;
+
+in = g ;
+
+out = g;
+
+loops = 1 ;
+
+loop_momentum = k ;
+
+options = onshell;
+
+true = iprop[H,0,0];
