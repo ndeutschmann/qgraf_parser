@@ -39,14 +39,18 @@ class DiagramField(object):
 
     @staticmethod
     def parse_xml_external_leg(external_leg_node):
-        """TODO DOC
+        """Lowe level parser to read a <leg> entry of the XML diagram
+
+        This method is accessible through the class method `parse` through the option mode='XML'
+
         Parameters
         ----------
-        external_leg_node :
+        external_leg_node :  xml.etree.ElementTree.Element
 
         Returns
         -------
-
+        tuple of str
+            A triplet of str: particle name, field id, momentum
         """
         name=external_leg_node.find("field").text
         field_id=external_leg_node.find("id").text
@@ -55,16 +59,19 @@ class DiagramField(object):
 
     @classmethod
     def parse(cls,external_leg_node,mode='XML'):
-        """TODO DOC
+        """Dispatcher function that sends a leg Node object to the approriate parser
 
         Parameters
         ----------
         external_leg_node :
-        mode :
+            Some object representing an external leg.
+        mode : str
+            For now only XML supported
 
         Returns
         -------
-
+        tuple of str
+            A triplet of str: particle name, field id, momentum
         """
         if mode=='XML':
             return cls.parse_xml_external_leg(external_leg_node)
@@ -75,17 +82,15 @@ class DiagramField(object):
 
     @classmethod
     def create_leg_from_node(cls,external_leg_node,model,mode='XML'):
-        """Alternate constructor: from a <leg> node
+        """Alternate constructor: from a <leg> node that is directly parsed into an object
 
-        TODO DOC
         Parameters
         ----------
-        external_leg_node :
-        mode :
+        Same as diagram_elements.DiagramField#parse
 
         Returns
         -------
-
+        None
         """
         cls(*cls.parse(external_leg_node,mode),model)
 
@@ -126,20 +131,13 @@ class DiagramField(object):
 
 class DiagramVertex(object):
     """Specific vertex in a Feynman diagram
-
-    TODO DOC
-    Attributes
-    ----------
-
-    Methods
-    -------
     """
 
     @staticmethod
     def parse_xml_vertex_node(vertex_node):
         """ Load the relevant data of a XML vertex node.
 
-        This method is accessible through the class attribute `parsers` by calling cls.parsers['XML']
+        This method is accessible through the class method `parse` through the option mode='XML'
 
         Parameters
         ----------
@@ -175,15 +173,19 @@ class DiagramVertex(object):
 
     @classmethod
     def parse(cls,vertex_node,mode):
-        """
-        TODO DOC
+        """Dispatcher function that sends a vertex Node object to the approriate parser
+
         Parameters
         ----------
-        mode :
+        vertex_node :
+            Some object representing an vertex
+        mode : str
+            For now only XML supported
 
         Returns
         -------
-
+        list of tuple of str:
+            triplets of (particle_type,field_id,momentum)
         """
         if mode=='XML':
             return cls.parse_xml_vertex_node(vertex_node)
@@ -293,11 +295,22 @@ class DiagramVertex(object):
 
 class DiagramPropagator(object):
     """Specific propagator in a Feynman diagram
-    TODO DOC
     """
     @staticmethod
     def parse_xml_propagator_node(propagator_node):
-        """TODO DOC
+        """Load the relevant data of a XML propagator Node.
+
+        This method is accessible through the class method `parse` through the option mode='XML'
+
+        Parameters
+        ----------
+        propagator_node : xml.etree.ElementTree.Element
+
+        Returns
+        -------
+        list of tuple of str:
+            (from_field,from_index,to_field,to_index,momentum)
+            where field refers to the field name and index refers to the field index in the diagram.
         """
         # I need to put in more details about propagator oriention. Here from and to refer to the flow of momentum
         # and to the arrows for fermion propagators. The indices must therefore go in the opposite direction (to_index,from_index)
@@ -310,15 +323,20 @@ class DiagramPropagator(object):
 
     @classmethod
     def parse(cls,propagator_node,mode):
-        """
-        TODO DOC
+        """Dispatcher function that sends a vertex Node object to the approriate parser
+
         Parameters
         ----------
-        mode :
+        propagator_node :
+            Some object representing an propagator
+        mode : str
+            For now only XML supported
 
         Returns
         -------
-
+        list of tuple of str:
+            (from_field,from_index,to_field,to_index,momentum)
+            where field refers to the field name and index refers to the field index in the diagram.
         """
         if mode=='XML':
             return cls.parse_xml_propagator_node(propagator_node)
@@ -364,7 +382,7 @@ class DiagramPropagator(object):
         ####################
 
     def generate_expression(self):
-        """ Call the interaction feynman rule generation routines with
+        """Generate the Feynman rule for this propagator
 
         Parameters
         ----------
@@ -372,7 +390,7 @@ class DiagramPropagator(object):
         Returns
         -------
         str
-            the expression of the feynman rule for this vertex
+            the expression of the feynman rule for this propagator
         """
         try:
             return self.propagator.generate_feynman_rule([self.from_field,self.to_field],self.momentum)
@@ -390,17 +408,21 @@ class Diagram(object):
 
     @staticmethod
     def parse_xml_diagram_node(diagram_node):
-        """
+        """Load the relevant data of a XML diagral Node.
+
+        This method is accessible through the class method `parse` through the option mode='XML'
 
         Parameters
         ----------
-        diagram_node :
+        diagram_node : xml.etree.ElementTree.Element
 
         Returns
         -------
-        TODO HANDLE EXCEPTIONS
-        TODO DOC
+        list of tuple of str:
+            (from_field,from_index,to_field,to_index,momentum)
+            where field refers to the field name and index refers to the field index in the diagram.
         """
+        #TODO Handle exceptions
         id = diagram_node.find("id").text
         vertices = diagram_node.find("vertices").findall("vertex")
         propagators = diagram_node.find("propagators").findall("propagator")
@@ -409,15 +431,20 @@ class Diagram(object):
 
     @classmethod
     def parse(cls,diagram_node,mode):
-        """
-        TODO DOC
+        """Dispatcher function that sends a vertex Node object to the approriate parser
+
         Parameters
         ----------
-        mode :
+        diagram_node :
+            Some object representing a diagram
+        mode : str
+            For now only XML supported
 
         Returns
         -------
-
+        list of tuple of str:
+            (from_field,from_index,to_field,to_index,momentum)
+            where field refers to the field name and index refers to the field index in the diagram.
         """
         if mode=='XML':
             return cls.parse_xml_diagram_node(diagram_node)
@@ -451,6 +478,7 @@ class Diagram(object):
         self.expression = NotImplemented
 
     def generate_expression(self):
+        """Gather all the Feynman rules for the diagram elements and multiply them together"""
         vertices = [v.generate_expression() for v in self.vertices]
         propagators = [p.generate_expression() for p in self.propagators]
         return times(*(vertices+propagators))
