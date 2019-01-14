@@ -1,17 +1,22 @@
 import re
-from os.path import isfile,join
+import os
+from shutil import copyfile
 from sys import path
 from ..generate import module_path
 import logging
 logger=logging.getLogger(__name__)
 
+
+
 def sanitize_input_file_path(file_path):
     """Check if a file is available in the module path, otherwise in the python path"""
+    #TODO instead of module path this shoud look in a subdirectory like 'resources'
+
     # Loop for the file in the module (qgraf_parser.generator) path
-    if isfile(join(module_path,file_path)):
-        return join(module_path,file_path)
+    if os.path.isfile(os.path.join(module_path,file_path)):
+        return os.path.join(module_path,file_path)
     # Is the file accessible directly?
-    elif isfile(file_path):
+    elif os.path.isfile(file_path):
         return file_path
     else:
         error = FileNotFoundError("File "+file_path+" not found")
@@ -68,8 +73,8 @@ def generate_qgraf_data(*,
 
     format_dict = {
         "output_file": output_file,
-        "style_file": sanitize_input_file_path(style_file),
-        "model_file": sanitize_input_file_path(model_file),
+        "style_file": os.path.basename(style_file),
+        "model_file": os.path.basename(model_file),
         "incoming": ", ".join(incoming),
         "outgoing": ", ".join(outgoing),
         "n_loops": n_loops,
@@ -151,3 +156,57 @@ def valid_particle_list(particles,model):
 
     return all([p in model.particles for p in particles])
 
+def create_process_directory(process_dir):
+    """
+    TODO DOC
+    TODO A Process directory should always be created in the generator submodule. There should be a safety check
+    Parameters
+    ----------
+    process_dir :
+
+    Returns
+    -------
+
+    """
+    process_path = os.path.join(module_path, process_dir)
+    if not os.path.exists(process_path):
+        logger.info('Creating the process directory:')
+        logger.info(process_path)
+        os.makedirs(process_path)
+        return process_path
+    else:
+        error = IOError("The chosen output path already exists")
+        logger.error(error)
+        logger.error(process_path)
+        raise error
+
+
+def dispatch_qgraf_inputs(*,
+                          process_path,
+                          style_file,
+                          model_file,
+                          **kwargs):
+    """
+    TODO DOC
+    Parameters
+    ----------
+    process_path :
+    style_file :
+    model_file :
+    kwargs :
+
+    Returns
+    -------
+
+    """
+    # If the filename is not in the path, look for it in the default location in the module
+    style_file_src = sanitize_input_file_path(style_file)
+    model_file_src = sanitize_input_file_path(model_file)
+
+    # We will copy these files to the process directory
+    style_file_tgt = os.path.join(process_path,os.path.basename(style_file))
+    model_file_tgt = os.path.join(process_path,os.path.basename(model_file))
+    logger.info("Copying the style file to the process directory")
+    copyfile(style_file_src,style_file_tgt)
+    logger.info("Copying the model file to the process directory")
+    copyfile(model_file_src,model_file_tgt)
