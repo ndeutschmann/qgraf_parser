@@ -3,7 +3,7 @@
 The main feature is the implementation of the GeneratorCmd class
 """
 from cmd import Cmd
-import qgraf_parser.generate.qgraf_setup as qgraf_setup
+import qgraf_parser.generator.qgraf_setup as qgraf_setup
 import subprocess
 import os
 

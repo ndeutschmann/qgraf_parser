@@ -2,7 +2,7 @@ import re
 import os
 from shutil import copyfile
 from sys import path
-from ..generate import module_path
+from ..generator import module_path
 import logging
 logger=logging.getLogger(__name__)
 

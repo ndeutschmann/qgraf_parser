@@ -15,7 +15,7 @@ Vertex and Propagators are the elements that have a feynman rule attached to the
 model, which is then searched to attach the corresponding Interaction/Propagator object
 (qgraf_parser.models.common_tools.abstract_objects.Interaction or [...].Propagator)
 """
-from .models.common_tools.algebra_tools import times
+from qgraf_parser.models.common_tools.algebra_tools import times
 import logging
 logger=logging.getLogger(__name__)
 

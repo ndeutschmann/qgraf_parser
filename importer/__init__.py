@@ -13,7 +13,7 @@ logger=logging.getLogger(__name__)
 
 from xml.etree.ElementTree import XML,parse
 from xml.etree.ElementInclude import default_loader
-from qgraf_parser.diagram_elements import Diagram
+from qgraf_parser.parser.diagram_elements import Diagram
 
 
 def generate_XML_diagrams_node(file_path):

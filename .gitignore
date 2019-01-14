@@ -8,3 +8,4 @@ qgraf-py3-venv/
 .idea/
 *.ipynb
 .ipynb_checkpoints/
+generator/test*
