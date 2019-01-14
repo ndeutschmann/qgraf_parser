@@ -1,6 +1,22 @@
 import re
+from os.path import isfile,join
+from sys import path
+from ..generate import module_path
 import logging
 logger=logging.getLogger(__name__)
+
+def sanitize_input_file_path(file_path):
+    """Check if a file is available in the module path, otherwise in the python path"""
+    # Loop for the file in the module (qgraf_parser.generator) path
+    if isfile(join(module_path,file_path)):
+        return join(module_path,file_path)
+    # Is the file accessible directly?
+    elif isfile(file_path):
+        return file_path
+    else:
+        error = FileNotFoundError("File "+file_path+" not found")
+        logger.error(error)
+        raise error
 
 
 def generate_qgraf_data(*,
@@ -52,8 +68,8 @@ def generate_qgraf_data(*,
 
     format_dict = {
         "output_file": output_file,
-        "style_file": style_file,
-        "model_file": model_file,
+        "style_file": sanitize_input_file_path(style_file),
+        "model_file": sanitize_input_file_path(model_file),
         "incoming": ", ".join(incoming),
         "outgoing": ", ".join(outgoing),
         "n_loops": n_loops,
@@ -62,7 +78,7 @@ def generate_qgraf_data(*,
     }
 
 
-    with open(qgraf_template) as template_file:
+    with open(sanitize_input_file_path(qgraf_template)) as template_file:
         return template_file.read().format(**format_dict)
 
 

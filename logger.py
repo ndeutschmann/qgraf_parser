@@ -61,7 +61,8 @@ def init_logger(name, *,stderr_output=False,stderr_level=logging.ERROR,stdout_ou
     logger = logging.getLogger(name)
 
     # Common format for all msg
-    my_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    my_long_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    my_formatter = logging.Formatter('%(name)s - %(levelname)s: %(message)s')
 
     # stderr output handler
     if stderr_output:
@@ -90,7 +91,7 @@ def init_logger(name, *,stderr_output=False,stderr_level=logging.ERROR,stdout_ou
     if true_logfile_output:
         my_file_handler = logging.FileHandler(logfile_path)
         my_file_handler.setLevel(logfile_level)
-        my_file_handler.setFormatter(my_formatter)
+        my_file_handler.setFormatter(my_long_formatter)
         logger.addHandler(my_file_handler)
     # The logger lets all message filter through to the handlers, which are responsible for the triage.
     logger.setLevel(logging.DEBUG)
