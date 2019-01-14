@@ -13,8 +13,8 @@ logger=logging.getLogger(__name__)
 class GeneratorCmd(Cmd):
     """The command-line interface for the QGRAF generator of qgraf_parser
     """
-    prompt = 'QGRAF>'
-    intro = "Welcome! Type ? to list commands"
+    prompt = 'QGRAF-generator>'
+    intro = "Welcome to the generator! Type ? to list commands"
 
     def valid_config(self):
         """Verify if the GeneratorCmd configuration has the correct entries"""
@@ -36,7 +36,6 @@ class GeneratorCmd(Cmd):
                 return False
 
         return True
-
 
 
     def __init__(self,*args,config,**kwargs):
